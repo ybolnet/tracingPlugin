@@ -9,4 +9,5 @@ object TraceProcessingParams {
     const val TRACING_FEATURE_CONFIG = "tracing"
     const val TRACEPERFORMER_PACKAGE = "com.ey.ybo.trackinglib.tracer.TracePerformer"
     const val TRACABLE_TASKS_PREFIX = "traced"
+    const val PLUGIN_NAME = "tracePlugin"
 }

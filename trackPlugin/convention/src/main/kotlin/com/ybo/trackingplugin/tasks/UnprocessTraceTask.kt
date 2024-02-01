@@ -1,7 +1,6 @@
 package com.ybo.trackingplugin.tasks
 
 import com.ybo.trackingplugin.tasks.data.TraceAnnotationMark
-import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
@@ -9,14 +8,11 @@ open class UnprocessTraceTask : BrowsingTask() {
 
     @TaskAction
     fun unprocessTrace() {
-        if (pathForSourceCode == null) {
-            throw GradleException("srcPath must be defined")
-        }
-        browseCode {
+        browseCode { tracked, conf ->
             unprocessTraceAnnotations(
-                it.file,
-                it.toBeProcessedMarkToTrack,
-                it.alreadyProcessedMarkToTrack,
+                tracked.file,
+                tracked.toBeProcessedMarkToTrack,
+                tracked.alreadyProcessedMarkToTrack,
             )
         }
     }
@@ -32,14 +28,8 @@ open class UnprocessTraceTask : BrowsingTask() {
         var text = file.readText()
         val tagCatchingRegex = Regex("\\s*/\\*$tag\\*/.*")
         val matcher = tagCatchingRegex.findAll(text)
-        println("try unprocessing trace for file " + file.name)
-        if (matcher.count() == 0 ||
-            (
-                !text.contains(processed.longVersion) &&
-                    !text.contains(processed.shortVersion)
-                )
-        ) {
-            println("file is not concerned by unprocessing. ")
+        println("try unprocessing trace for file " + file.name + ", notation ${processed.longVersion}")
+        if (!text.contains(processed.longVersion) && !text.contains(processed.shortVersion)) {
             return false
         }
         println("unprocessing trace for file " + file.name)

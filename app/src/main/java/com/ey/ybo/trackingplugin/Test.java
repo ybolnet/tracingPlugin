@@ -1,14 +1,14 @@
 package com.ey.ybo.trackingplugin;
 
-import com.ey.ybo.trackingplugin.annotations.ToTrace;
+import com.ey.ybo.trackingplugin.annotations.TraceWithReturns;
 
 public class Test {
 
-    @ToTrace
+    @TraceWithReturns
     public void bob(int b, float c) {
     }
 
-    @ToTrace
+    @TraceWithReturns
     public void bosb(int b, float c) {
         int v=2;
     }

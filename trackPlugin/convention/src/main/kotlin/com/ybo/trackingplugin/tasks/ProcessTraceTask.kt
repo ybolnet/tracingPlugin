@@ -20,19 +20,20 @@ import java.io.File
 
 open class ProcessTraceTask : BrowsingTask() {
 
-    @Input
-    var tracerFactory: String = ""
+
 
     @TaskAction
     fun processTrace() {
-        if (pathForSourceCode == null) {
-            throw GradleException("srcPath must be defined")
-        }
-        browseCode {
+
+        browseCode { tracked, config ->
+            if (config.srcPath == null) {
+                throw GradleException("srcPath must be defined")
+            }
             processTraceAnnotations(
-                it.file,
-                it.toBeProcessedMarkToTrack,
-                it.alreadyProcessedMarkToTrack,
+                tracked.file,
+                tracked.toBeProcessedMarkToTrack,
+                tracked.alreadyProcessedMarkToTrack,
+                config.tracerFactory
             )
         }
     }
@@ -41,6 +42,7 @@ open class ProcessTraceTask : BrowsingTask() {
         file: File,
         mark: TraceAnnotationMark,
         processed: TraceAnnotationMark,
+        tracerFactortStr: String,
     ): Boolean {
         val tag = TraceProcessingParams.TAG
         var text = file.readText()
@@ -65,21 +67,15 @@ open class ProcessTraceTask : BrowsingTask() {
                     .extract(method.paramBlock)
                     .joinToString(", ") { it.name }
 
-                //extractParamsString(method, mark.language)
                 var newLine = (method.wholeMethod + "")
                     .replace(mark.shortVersion, processed.longVersion)
                     .replace(mark.longVersion, processed.longVersion)
-                /*if (mark.language == KOTLIN) {
-                    if (!method.wholeMethod.contains("{")) {
-                        throw GradleException("problem of missing '{'")
-                    }
-                    newLine = newLine.replaceLastOccurrence('{', '=')
-                }*/
+
                 text = text.replace(
                     method.wholeMethod,
                     newLine + codeGenerator.generate(
                         params = paramsStr,
-                        tracerFactoryString = tracerFactory,
+                        tracerFactoryString = tracerFactortStr,
                         insideMethodIndentation = method.indentationInsideMethod,
                         methodName = method.methodName,
                         tag = tag,

@@ -1,6 +1,6 @@
 package com.ey.ybo.trackingplugin.annotations.tracers
 
-import com.ey.ybo.trackingplugin.annotations.ToTrace
+import com.ey.ybo.trackingplugin.annotations.TraceWithReturns
 
 fun <T> Any.withTrace(): T {
     val throwable = Throwable()
@@ -16,7 +16,7 @@ fun <T> Any.withTrace(): T {
 }
 
 class Returner {
-    @ToTrace
+    @TraceWithReturns
     fun <T> traceReturning(toTrace: T, callingMethod: String): T {
         return toTrace
     }

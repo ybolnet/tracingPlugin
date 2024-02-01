@@ -1,5 +1,6 @@
 package com.ybo.trackingplugin.tasks
 
+import com.ybo.trackingplugin.extension.TraceConfig
 import com.ybo.trackingplugin.tasks.data.TraceAnnotationMark
 import com.ybo.trackingplugin.tasks.data.getLanguage
 import org.gradle.api.DefaultTask
@@ -14,6 +15,9 @@ open class BrowsingTask : DefaultTask() {
     }
 
     @Input
+    var listOfConfigs: List<TraceConfig> = emptyList()
+    /*
+    @Input
     var traceAnnotation: String? = null
 
     @Input
@@ -23,7 +27,7 @@ open class BrowsingTask : DefaultTask() {
     var pathForSourceCode: String? = null
 
     @Input
-    var excluding: Array<String> = emptyArray()
+    var excluding: Array<String> = emptyArray()*/
 
     data class TrackedFile(
         val file: File,
@@ -31,37 +35,39 @@ open class BrowsingTask : DefaultTask() {
         val alreadyProcessedMarkToTrack: TraceAnnotationMark,
     )
 
-    fun browseCode(block: (file: TrackedFile) -> Unit) {
-        println("looking for files in $pathForSourceCode ")
-        val fileTree: FileTree =
-            project.fileTree(pathForSourceCode + "")
-                .matching {
-                    include("**/*.kt")
-                    include("**/*.java")
-                    if(excluding.isNotEmpty()){
-                        exclude(*excluding)
+    fun browseCode(block: (file: TrackedFile, conf: TraceConfig) -> Unit) {
+        listOfConfigs.forEach { config ->
+            println("browsing file for config $config")
+            val fileTree: FileTree =
+                project.fileTree(config.srcPath + "")
+                    .matching {
+                        include("**/*.kt")
+                        include("**/*.java")
+                        if (config.exclude?.isNotEmpty() == true) {
+                            config.exclude?.let { it1 -> exclude(*it1) }
+                        }
                     }
+            println("tree ${fileTree.files} ")
 
+            fileTree.forEach {
+                println("dealing with file ${it.name}")
+                if (it.canRead()) {
+                    println("we can process ${it.name}")
+                    val processedMarkToTrack =
+                        TraceAnnotationMark(config.alreadyProcessedAnnotation, it.getLanguage())
+                    val toBeProcessedMarkToTrack =
+                        TraceAnnotationMark(config.toBeProcessedAnnotation, it.getLanguage())
+                    block(
+                        TrackedFile(
+                            file = it,
+                            toBeProcessedMarkToTrack = toBeProcessedMarkToTrack,
+                            alreadyProcessedMarkToTrack = processedMarkToTrack,
+                        ),
+                        config,
+                    )
+                } else {
+                    println("we cannot read ${it.name}")
                 }
-        println("tree ${fileTree.files} ")
-
-        fileTree.forEach {
-            println("dealing with file ${it.name}")
-            if (it.canRead()) {
-                println("we can process ${it.name}")
-                val processedMarkToTrack =
-                    TraceAnnotationMark(processedAnnotation, it.getLanguage())
-                val toBeProcessedMarkToTrack =
-                    TraceAnnotationMark(traceAnnotation, it.getLanguage())
-                block(
-                    TrackedFile(
-                        file = it,
-                        toBeProcessedMarkToTrack = toBeProcessedMarkToTrack,
-                        alreadyProcessedMarkToTrack = processedMarkToTrack,
-                    ),
-                )
-            } else {
-                println("we cannot read ${it.name}")
             }
         }
     }
