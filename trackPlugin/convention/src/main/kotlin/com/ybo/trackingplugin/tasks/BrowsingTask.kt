@@ -16,18 +16,6 @@ open class BrowsingTask : DefaultTask() {
 
     @Input
     var listOfConfigs: List<TraceConfig> = emptyList()
-    /*
-    @Input
-    var traceAnnotation: String? = null
-
-    @Input
-    var processedAnnotation: String? = null
-
-    @Input
-    var pathForSourceCode: String? = null
-
-    @Input
-    var excluding: Array<String> = emptyArray()*/
 
     data class TrackedFile(
         val file: File,

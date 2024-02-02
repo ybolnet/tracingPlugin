@@ -62,27 +62,6 @@ class _TracedMethodsPatternProducerSearcherKotlin(
         override val markToLookFor: TraceAnnotationMark,
     ) : NormalMethod(markToLookFor) {
         override val name = "KotlinExtensionMethod"
-        override val methodName: String = "\\w+\\.\\w+"
+        override val methodName: String = "[\\w\\.]+"
     }
-
-    /*
-    private fun markedNormalMethods(): PatternToSearch {
-        val toProcessAnnotationShort = markToLookFor.shortVersion
-        val toProcessAnnotationLong = markToLookFor.longVersion
-        return PatternToSearch(
-            name = "KotlinNormalMethod",
-            language = markToLookFor.language,
-            regex = Regex("($toProcessAnnotationShort|$toProcessAnnotationLong)\\s*\\n*(?:\\s*@[^\\n]*\\s*\\n*)*\\s*(?:override)?\\s+fun\\b(?:\\s*<\\s*\\w*\\s*>\\s*)?\\s+(\\w+)\\s*\\(([^)]*)\\)\\s*(?::\\s*\\w+)?\\s*\\{[\\t ]*\\n(\\s*)"),
-        )
-    }
-
-    private fun markedExtensionMethods(): PatternToSearch {
-        val toProcessAnnotationShort = markToLookFor.shortVersion
-        val toProcessAnnotationLong = markToLookFor.longVersion
-        return PatternToSearch(
-            "KotlinExtensionMethod",
-            language = markToLookFor.language,
-            regex = Regex("($toProcessAnnotationShort|$toProcessAnnotationLong)\\s*\\n*(?:\\s*@[^\\n]*\\s*\\n*)*\\s*(?:override)?\\s+fun\\b(?:\\s*<\\s*\\w*\\s*>\\s*)?\\s+(\\w+\\.\\w+)\\s*\\(([^)]*)\\)\\s*(?::\\s*\\w+)?\\s*\\{[\\t ]*\\n(\\s*)"),
-        )
-    }*/
 }

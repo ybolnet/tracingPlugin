@@ -7,4 +7,4 @@ data class TraceConfig(
     var toBeProcessedAnnotation: String? = null,
     var alreadyProcessedAnnotation: String? = null,
     var srcPath: String? = null,
-    )
+)

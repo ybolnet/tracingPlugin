@@ -14,17 +14,13 @@ import com.ybo.trackingplugin.tasks.utils.createPatternProducerForTracedParams
 import com.ybo.trackingplugin.tasks.utils.createPatternSearcherForTracedMethods
 import com.ybo.trackingplugin.tasks.utils.createPatternSearcherForTracedParams
 import org.gradle.api.GradleException
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
 open class ProcessTraceTask : BrowsingTask() {
 
-
-
     @TaskAction
     fun processTrace() {
-
         browseCode { tracked, config ->
             if (config.srcPath == null) {
                 throw GradleException("srcPath must be defined")
@@ -33,7 +29,7 @@ open class ProcessTraceTask : BrowsingTask() {
                 tracked.file,
                 tracked.toBeProcessedMarkToTrack,
                 tracked.alreadyProcessedMarkToTrack,
-                config.tracerFactory
+                config.tracerFactory,
             )
         }
     }
@@ -67,7 +63,7 @@ open class ProcessTraceTask : BrowsingTask() {
                     .extract(method.paramBlock)
                     .joinToString(", ") { it.name }
 
-                var newLine = (method.wholeMethod + "")
+                val newLine = (method.wholeMethod + "")
                     .replace(mark.shortVersion, processed.longVersion)
                     .replace(mark.longVersion, processed.longVersion)
 
@@ -89,88 +85,5 @@ open class ProcessTraceTask : BrowsingTask() {
         file.writeText(text)
         println("processing trace done for file " + file.name)
         return true
-    }
-
-    private fun extractParamsString(method: TracedMethod, language: TracedLanguage): String {
-        val tracedMethodParams = extractTracedParams(method, language)
-        return tracedMethodParams.joinToString(", ") { it.name }
-    }
-
-    private fun extractTracedMethods(
-        text: String,
-        toBeProcessedMark: TraceAnnotationMark,
-    ): List<TracedMethod> {
-        println("extracting method in here. ${toBeProcessedMark.language} is the language")
-        val toProcessAnnotationShort = toBeProcessedMark.shortVersion
-        val toProcessAnnotationLong = toBeProcessedMark.longVersion
-
-        val catchingMethodsRegex = when (toBeProcessedMark.language) {
-            KOTLIN -> Regex("($toProcessAnnotationShort|$toProcessAnnotationLong)\\s*\\n*(?:\\s*@[^\\n]*\\s*\\n*)*\\s*(?:override)?\\s+fun\\b\\s+(\\w+)\\s*\\(([^)]*)\\)\\s*(?::\\s*\\w+)?\\s*\\{[\\t ]*\\n(\\s*)")
-            JAVA -> Regex("($toProcessAnnotationShort|$toProcessAnnotationLong)\\s*\\n*(?:\\s*@[^\\n]*\\s*\\n*)*\\s*(?:public\\s+|protected\\s+|private\\s+|static\\s+|\\s)[\\w<>\\[\\]\\.]+\\s+(\\w+)\\s*\\(([^)]*)\\)\\s*\\{[ \\t]*\\n*([ \\t]*)")
-            else -> null
-        }
-        println("regex $catchingMethodsRegex")
-
-        val matcher = catchingMethodsRegex?.findAll(text)
-        if (matcher == null || matcher.count() == 0) {
-            println("nothing interesting here")
-            return emptyList()
-        }
-        return matcher.map {
-            TracedMethod(
-                wholeMethod = it.groupValues[0],
-                indentationInsideMethod = if (it.groupValues.size > 4) it.groupValues[4] else " ",
-                paramBlock = it.groupValues[3],
-                methodName = it.groupValues[2],
-            )
-        }.toList()
-    }
-
-    private fun extractTracedParams(
-        method: TracedMethod,
-        language: TracedLanguage,
-    ): List<TracedMethodParam> {
-        println("extracting params... language $language")
-        val extractingParamsRegex = when (language) {
-            KOTLIN -> Regex("\\b(\\w+)\\s*:\\s*([^,=]+(?:\\s*=\\s*[^,]+)?)")
-            JAVA -> Regex("(?:@(?:\\w+(?:\\n*\\.\\n*)?)+(?:\\(.*\\))*\\s*)?(?:final\\s)?[\\w.]+\\s+(\\w+)\\s*,?")
-            else -> null
-        }
-        println("regex for params $extractingParamsRegex")
-        val matcherParams = extractingParamsRegex?.findAll(method.paramBlock)
-        if (matcherParams == null || matcherParams.count() == 0) {
-            if (method.paramBlock.isAllWhitespace()) {
-                println(
-                    "could not extract any params from :\n " +
-                        "${method.wholeMethod}\n" +
-                        " because there are none, and it's ok.",
-                )
-            } else {
-                println(
-                    "\"extracted param block is ill-formatted and it is not normal:\\n\" +\n" +
-                        "                        \"method : ${method.wholeMethod}\\n\" +\n" +
-                        "                        \"param block ${method.paramBlock}\\n\", ",
-                )
-                /*throw GradleException(
-                    "extracted param block is ill-formatted and it is not normal:\n" +
-                        "method : ${method.wholeMethod}\n" +
-                        "param block ${method.paramBlock}\n",
-                )*/
-            }
-            return emptyList()
-        }
-        return matcherParams.map {
-            TracedMethodParam(it.groupValues[1])
-        }.toList()
-    }
-
-    fun String.replaceLastOccurrence(charToReplace: Char, newChar: Char): String {
-        val lastIndexOfChar = lastIndexOf(charToReplace)
-
-        return if (lastIndexOfChar >= 0) {
-            substring(0, lastIndexOfChar) + newChar + substring(lastIndexOfChar + 1)
-        } else {
-            this // Character not found, return the original string
-        }
     }
 }

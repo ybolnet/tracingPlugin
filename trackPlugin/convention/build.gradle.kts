@@ -5,23 +5,20 @@ plugins {
 }
 
 group = "io.github.ybolnet"
-version = "0.0.2"
+version = "0.0.4"
+description = "testdesc"
 
+/*
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
-}
+}*/
 
 repositories {
     google()
     mavenCentral()
     maven("https://plugins.gradle.org/m2/")
     gradlePluginPortal()
-}
-
-dependencies {
-    compileOnly("com.android.tools.build:gradle:7.4.2")
-    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10")
 }
 
 gradlePlugin {
@@ -32,24 +29,41 @@ gradlePlugin {
         }
     }
 }
-
+/*
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
-}
+}*/
 afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("TracePlugin") {
                 groupId = "io.github.ybolnet"
                 artifactId = "traceplugin"
-                version = "0.0.2"
-                from(components["java"])
+                version = "0.0.4"
+                components.forEach {
+                    println("TESTACOMP ${it.name}")
+                }
+
+                from(components["kotlin"])
 
                 pom {
                     name.set("TracePlugin")
-                    description.set("gradle plugin for tracing")
+                    description.set("Gradle plugin for tracing")
+                    url.set("https://github.com/ybolnet/tracingPlugin") // Set your project URL
+                    developers {
+                        developer {
 
-                    // ... Additional pom configuration
+                            name.set("YBOLNET")
+                            email.set("yannick.bolner@gmaul.com")
+                        }
+                        // Add more developers if needed
+                    }
+                }
+                signing {
+                    publishing.publications.forEach {
+                        println("TESTACOMP ${it.name}")
+                    }
+                    sign(publishing.publications["TracePlugin"])
                 }
             }
         }
@@ -58,17 +72,10 @@ afterEvaluate {
             maven {
                 url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
                 credentials {
-                    username = "CyrilleTelmer"
-                    password = "Cracotte123&Jira"
+                    username = "héhé"
+                    password = "héhé"
                 }
             }
-        }
-
-        signing {
-            // useGpgCmd()
-            // useGpgKeyChain()
-            sign(publishing.publications)
-            // useGpgKeyChain()
         }
     }
 }
