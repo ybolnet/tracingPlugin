@@ -69,8 +69,8 @@ So now in app build.gradle, you can plug in your tracer and your annotations by 
         //add a configuration for the couple @Trace/@UnTrace
         add { 
             name = "ANameForThisConfig"
-            toBeProcessedAnnotation = "your.package.com.Trace"
-            alreadyProcessedAnnotation = "your.package.com.UnTrace"
+            toBeProcessedAnnotation = "your.package.com.SimpleTrace"
+            alreadyProcessedAnnotation = "your.package.com.ReverseSimpleTrace"
             srcPath = "../app/src/main" // where the source code is
             tracerFactory = "your.package.com.TraceFactory"
         }
@@ -95,7 +95,9 @@ After sync, 3 tasks will be added in group traceprocessing:
 - unprocessTrace
 
 processTrace will edit the code to add the logs.
+
 unprocessTrace will get it back to what it was.
+
 tracedInstallDebug will do : processTrace -> installDebug -> unprocessTrace. So can install a traced version of your app on the phone.
 
 
