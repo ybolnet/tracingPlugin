@@ -3,6 +3,7 @@ Plugin allowing to add automatic logger (or any other process) to every call of 
 
 add to your project with this in build. toplevel:
 <p>
+   ```
    buildscript {
     repositories {
         mavenCentral()
@@ -11,6 +12,7 @@ add to your project with this in build. toplevel:
         classpath ("io.github.ybolnet:traceplugin:VERSION")
     }
 } 
+   ```
 </p>
 
 
@@ -18,17 +20,21 @@ add to your project with this in build. toplevel:
 then to app-level build.gradle:
 
 <p>
+   ```
    plugins {
     ...
     id("io.github.ybolnet")
 } 
+   ```
 </p>
 
 now you must create in your code a set of 2 annotations that will represent the 2 states of the code: To-Be-Processed and Already-Processed.
 For example :
 <p>
+   ```
     annotation class SimpleTrace()
 annotation class ReverseSimpleTrace()
+   ```
 </p>
 
 
@@ -40,6 +46,7 @@ So now you have to implement your own tracer to be delegated when a traced metho
 
 for example:
 <p>
+   ```
     package your.package.com
 
 import com.ybo.trackingplugin.tracerlib.Tracer
@@ -51,12 +58,13 @@ class TraceFactory : Tracer.Factory {
         return MyTracerImpl() //<- here your implementation of tracer
     }
 }
+```
 </p>
 
 So now in app build.gradle, you can plug in your tracer and your annotations by writing:
 
 <p>
-
+```
     tracing{
     trackables = arrayOf("installDebug") // means that install debug will be traced
     config{
@@ -71,14 +79,17 @@ So now in app build.gradle, you can plug in your tracer and your annotations by 
         // and actually you can add as much configsthat you want.
     }
 }
+```
 </p>
 
 and eventually, still in app build.gradle:
 
 <p>
+```
     dependencies{
     implementation("io.github.ybolnet:traceplugin:0.0.17")
     }
+    ```
     
 </p>
 After sync, 3 tasks will be added in group traceprocessing:
