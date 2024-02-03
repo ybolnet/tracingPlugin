@@ -1,5 +1,7 @@
 package com.ybo.trackingplugin.tracerlib
 
+import com.ybo.trackingplugin.decodedFromB64
+
 object TracePerformer {
 
     fun trace(
@@ -17,11 +19,22 @@ object TracePerformer {
                 null
             }
         }
-        val fullMethodName = (stackElement?.className ?: "") + "." + method
+        val fullMethodName = (stackElement?.className ?: "") +
+            "." + method.decodedFromB64()
+        val fullMethodNamePossiblyObfuscated = (
+            (stackElement?.className ?: "") +
+                "." + stackElement?.methodName
+            )
+        val currentMethod = Tracer.Method(
+            originalName = fullMethodName,
+            possiblyObfuscatedMethod = fullMethodNamePossiblyObfuscated,
+        )
+        historyOfMethods.add(currentMethod)
         tracer.trace(
             defaultMessage = makeMessage(java, fullMethodName, paramz),
             java = java,
-            methodName = fullMethodName,
+            method = currentMethod,
+            history = historyOfMethods,
             parameterValues = paramz,
         )
     }
@@ -39,4 +52,6 @@ object TracePerformer {
 
         return " $methodName($params) "
     }
+
+    private val historyOfMethods: LimitedSizeList<Tracer.Method> = LimitedSizeList(100)
 }

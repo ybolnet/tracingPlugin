@@ -1,6 +1,7 @@
 package com.ybo.trackingplugin.tasks.utils.impl
 
 import com.ybo.trackingplugin.tasks.utils.CodeGenerator
+import com.ybo.trackingplugin.toB64
 
 class _CodeGeneratorJava : CodeGenerator() {
     override fun generate(
@@ -12,7 +13,7 @@ class _CodeGeneratorJava : CodeGenerator() {
     ): String {
         return "/*$tag*/ $tracePerformerPackage.INSTANCE.trace(" +
             "new " + tracerFactoryString + "(), " +
-            "\"" + methodName + "\", " +
+            "\"" + methodName.toB64() + "\", " +
             "true, " +
             "new Object[]{" + params + "} " +
             ");\n" +

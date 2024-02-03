@@ -10,9 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.ey.ybo.trackingplugin.annotations.SimpleTrace
-import com.ey.ybo.trackingplugin.annotations.TraceWithReturns
-import com.ey.ybo.trackingplugin.annotations.tracers.withTrace
+import com.ey.ybo.trackingplugin.annotations.Trace
 import com.ey.ybo.trackingplugin.ui.theme.TrackingPluginTheme
 
 class MainActivity : ComponentActivity() {
@@ -34,24 +32,24 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@TraceWithReturns
+@Trace
 fun test(p1: Int, p2: Double, p3: Int = 4): Int {
     android.util.Log.d("TESTO", "TESTIL")
     val b: Int = p1
-    return (p1 + 1).withTrace()
+    return (p1 + 1)
 }
 
-@TraceWithReturns
+@Trace
 fun test2() {
     val b: Int = 1
 }
 
-@TraceWithReturns
+@Trace
 private fun test3() {
     val b: Int = 1
 }
 
-@SimpleTrace
+@Trace
 private fun test4() {
     val b: Int = 1
 }
@@ -77,8 +75,7 @@ fun GreetingPreview() {
     }
 }
 
-@SimpleTrace
-@TraceWithReturns
+@Trace
 inline fun <T> MainActivity.testExtension(p1: Int, p2: Int = 2): Double {
     return 0.0
 }

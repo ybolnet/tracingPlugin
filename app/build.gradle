@@ -10,18 +10,11 @@ tracing {
     config{
         def annotationPackage = "com.ey.ybo.trackingplugin.annotations"
         add{conf->
-            conf.name = "TraceWithReturns"
-            conf.toBeProcessedAnnotation = "${annotationPackage}.TraceWithReturns"
-            conf.alreadyProcessedAnnotation = "${annotationPackage}.ReverseTraceWithReturns"
+            conf.name = "Trace"
+            conf.toBeProcessedAnnotation = "${annotationPackage}.Trace"
+            conf.alreadyProcessedAnnotation = "${annotationPackage}.UnTrace"
             conf.srcPath = "../app/src/main"
             conf.tracerFactory = "${annotationPackage}.tracers.TracerFactory_WithReturns"
-        }
-        add{ conf->
-            conf.name = "BasicTrace"
-            conf.toBeProcessedAnnotation = "${annotationPackage}.SimpleTrace"
-            conf.alreadyProcessedAnnotation = "${annotationPackage}.ReverseSimpleTrace"
-            conf.srcPath = "../app/src/main"
-            conf.tracerFactory = "${annotationPackage}.tracers.TracerFactory_Simple"
         }
     }
 

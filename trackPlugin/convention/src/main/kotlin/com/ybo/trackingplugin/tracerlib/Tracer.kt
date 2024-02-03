@@ -7,8 +7,14 @@ interface Tracer {
     fun trace(
         defaultMessage: String,
         java: Boolean,
-        methodName: String,
+        method: Method,
+        history: LimitedSizeList<Method>,
         parameterValues: Array<Any?>,
+    )
+
+    data class Method(
+        val originalName: String,
+        val possiblyObfuscatedMethod: String,
     )
 
     /** factory for Tracers. */
