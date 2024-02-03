@@ -29,3 +29,19 @@ annotation class ReverseSimpleTrace()
 The methods annotated with SimpleTrace will be the one producing the tracing logs. The annotation ReverseSimpleTrace will not be used by you but by the plugin, to mark the method it has already processed.
 
 This plugin's job consists in adding a single line at the start of each method annotated with the annotation of your choice, and provides you a hook to be called each time the annotated method is called, with its arguments.
+
+So now you have to implement your own tracer to be delegated when a traced method is called:
+
+for example:
+
+package your.package.com
+
+import com.ybo.trackingplugin.tracerlib.Tracer
+
+
+/** used in build.gradle */
+class TracerFactory_Simple : Tracer.Factory {
+    override fun create(): Tracer {
+        return MyTracer() //<-- here put your implementation of Tracer class.
+    }
+}
