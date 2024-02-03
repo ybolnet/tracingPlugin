@@ -18,23 +18,23 @@ add to your project with this in build. toplevel:
 
 then to app-level build.gradle:
 
-<p>
+
    ```
    plugins {
     ...
     id("io.github.ybolnet")
 } 
    ```
-</p>
+
 
 now you must create in your code a set of 2 annotations that will represent the 2 states of the code: To-Be-Processed and Already-Processed.
 For example :
-<p>
+
    ```
     annotation class SimpleTrace()
 annotation class ReverseSimpleTrace()
    ```
-</p>
+
 
 
 The methods annotated with SimpleTrace will be the one producing the tracing logs. The annotation ReverseSimpleTrace will not be used by you but by the plugin, to mark the method it has already processed.
@@ -44,7 +44,7 @@ This plugin's job consists in adding a single line at the start of each method a
 So now you have to implement your own tracer to be delegated when a traced method is called:
 
 for example:
-<p>
+
    ```
     package your.package.com
 
@@ -58,11 +58,10 @@ class TraceFactory : Tracer.Factory {
     }
 }
 ```
-</p>
+
 
 So now in app build.gradle, you can plug in your tracer and your annotations by writing:
 
-<p>
 ```
     tracing{
     trackables = arrayOf("installDebug") // means that install debug will be traced
@@ -79,18 +78,17 @@ So now in app build.gradle, you can plug in your tracer and your annotations by 
     }
 }
 ```
-</p>
+
 
 and eventually, still in app build.gradle:
 
-<p>
+
 ```
     dependencies{
     implementation("io.github.ybolnet:traceplugin:0.0.17")
     }
-    ```
+ ```
     
-</p>
 After sync, 3 tasks will be added in group traceprocessing:
 - processTrace
 - tracedInstallDebug
