@@ -8,6 +8,7 @@ import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.Input
 import java.io.File
 
+/** Base task browsing through java and kotlin files.*/
 open class BrowsingTask : DefaultTask() {
 
     init {
@@ -25,7 +26,7 @@ open class BrowsingTask : DefaultTask() {
 
     fun browseCode(block: (file: TrackedFile, conf: TraceConfig) -> Unit) {
         listOfConfigs.forEach { config ->
-            println("browsing file for config $config")
+            println("iterating through files for config $config")
             val fileTree: FileTree =
                 project.fileTree(config.srcPath + "")
                     .matching {
@@ -35,12 +36,11 @@ open class BrowsingTask : DefaultTask() {
                             config.exclude?.let { it1 -> exclude(*it1) }
                         }
                     }
-            println("tree ${fileTree.files} ")
 
             fileTree.forEach {
-                println("dealing with file ${it.name}")
+                println("handling file ${it.name}")
                 if (it.canRead()) {
-                    println("we can process ${it.name}")
+                    println("file ${it.name} is readable, let's process it")
                     val processedMarkToTrack =
                         TraceAnnotationMark(config.alreadyProcessedAnnotation, it.getLanguage())
                     val toBeProcessedMarkToTrack =
@@ -54,7 +54,7 @@ open class BrowsingTask : DefaultTask() {
                         config,
                     )
                 } else {
-                    println("we cannot read ${it.name}")
+                    println("we cannot read ${it.name}. moving on.")
                 }
             }
         }

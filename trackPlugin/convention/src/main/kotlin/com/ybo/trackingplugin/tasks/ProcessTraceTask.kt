@@ -1,12 +1,6 @@
 package com.ybo.trackingplugin.tasks
 
 import com.ybo.trackingplugin.tasks.data.TraceAnnotationMark
-import com.ybo.trackingplugin.tasks.data.TracedLanguage
-import com.ybo.trackingplugin.tasks.data.TracedLanguage.JAVA
-import com.ybo.trackingplugin.tasks.data.TracedLanguage.KOTLIN
-import com.ybo.trackingplugin.tasks.data.TracedMethod
-import com.ybo.trackingplugin.tasks.data.TracedMethodParam
-import com.ybo.trackingplugin.tasks.data.isAllWhitespace
 import com.ybo.trackingplugin.tasks.utils.TextExtractor
 import com.ybo.trackingplugin.tasks.utils.createCodeGenerator
 import com.ybo.trackingplugin.tasks.utils.createPatternProducerForTracedMethods
@@ -17,6 +11,8 @@ import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
+/** task adding a trace call at the start of every traced method.
+ * counterpart of [UnprocessTraceTask]*/
 open class ProcessTraceTask : BrowsingTask() {
 
     @TaskAction
@@ -63,23 +59,23 @@ open class ProcessTraceTask : BrowsingTask() {
                     .extract(method.paramBlock)
                     .joinToString(", ") { it.name }
 
-                val newLine = (method.wholeMethod + "")
+                val newLine = (method.wholeSignature + "")
                     .replace(mark.shortVersion, processed.longVersion)
                     .replace(mark.longVersion, processed.longVersion)
 
                 text = text.replace(
-                    method.wholeMethod,
+                    method.wholeSignature,
                     newLine + codeGenerator.generate(
                         params = paramsStr,
                         tracerFactoryString = tracerFactortStr,
                         insideMethodIndentation = method.indentationInsideMethod,
-                        methodName = method.methodName,
+                        methodName = method.name,
                         tag = tag,
                     ),
                 )
             } catch (error: GradleException) {
                 error.printStackTrace()
-                println("skipping this method...")
+                println("skipping method ${method.name}...")
             }
         }
         file.writeText(text)

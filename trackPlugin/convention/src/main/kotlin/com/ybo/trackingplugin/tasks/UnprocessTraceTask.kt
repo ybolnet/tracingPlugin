@@ -4,11 +4,14 @@ import com.ybo.trackingplugin.tasks.data.TraceAnnotationMark
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
+/** task removing all trace calls at the start of every traced method.
+ * counterpart of [ProcessTraceTask]
+ * */
 open class UnprocessTraceTask : BrowsingTask() {
 
     @TaskAction
     fun unprocessTrace() {
-        browseCode { tracked, conf ->
+        browseCode { tracked, _ ->
             unprocessTraceAnnotations(
                 tracked.file,
                 tracked.toBeProcessedMarkToTrack,
@@ -28,7 +31,6 @@ open class UnprocessTraceTask : BrowsingTask() {
         var text = file.readText()
         val tagCatchingRegex = Regex("\\s*/\\*$tag\\*/.*")
         val matcher = tagCatchingRegex.findAll(text)
-        println("try unprocessing trace for file " + file.name + ", notation ${processed.longVersion}")
         if (!text.contains(processed.longVersion) && !text.contains(processed.shortVersion)) {
             return false
         }

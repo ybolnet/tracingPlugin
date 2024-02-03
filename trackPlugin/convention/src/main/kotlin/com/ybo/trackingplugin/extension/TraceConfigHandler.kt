@@ -4,9 +4,11 @@ import org.gradle.api.GradleException
 
 open class TraceProcessConfigHandler {
 
-    val editableListOfConfigs: MutableList<TraceConfig> = mutableListOf()
+    private val editableListOfConfigs: MutableList<TraceConfig> = mutableListOf()
     internal val configs: List<TraceConfig> get() = editableListOfConfigs.toList()
 
+    /** adds a configuration, ie a set of annotation represening what method to trace,
+     * and a factory to create a tracer for these traced methods.*/
     fun add(init: TraceConfig.() -> Unit) {
         val config = TraceConfig()
         config.init()

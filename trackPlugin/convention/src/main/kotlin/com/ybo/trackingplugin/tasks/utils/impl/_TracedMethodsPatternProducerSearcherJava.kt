@@ -2,7 +2,6 @@ package com.ybo.trackingplugin.tasks.utils.impl
 
 import com.ybo.trackingplugin.tasks.data.PatternToSearch
 import com.ybo.trackingplugin.tasks.data.TraceAnnotationMark
-import com.ybo.trackingplugin.tasks.data.TracedLanguage
 import com.ybo.trackingplugin.tasks.data.TracedMethod
 
 class _TracedMethodsPatternProducerSearcherJava(
@@ -17,10 +16,10 @@ class _TracedMethodsPatternProducerSearcherJava(
 
     override fun createSearchedResult(matchResult: MatchResult, patternName: String): TracedMethod {
         return TracedMethod(
-            wholeMethod = matchResult.groupValues[0],
+            wholeSignature = matchResult.groupValues[0],
             indentationInsideMethod = if (matchResult.groupValues.size > 4) matchResult.groupValues[4] else " ",
             paramBlock = matchResult.groupValues[3],
-            methodName = matchResult.groupValues[2],
+            name = matchResult.groupValues[2],
         )
     }
 

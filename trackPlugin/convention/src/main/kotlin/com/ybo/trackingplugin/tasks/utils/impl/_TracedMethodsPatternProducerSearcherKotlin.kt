@@ -10,10 +10,10 @@ class _TracedMethodsPatternProducerSearcherKotlin(
 
     override fun createSearchedResult(matchResult: MatchResult, patternName: String): TracedMethod {
         return TracedMethod(
-            wholeMethod = matchResult.groupValues[0],
+            wholeSignature = matchResult.groupValues[0],
             indentationInsideMethod = if (matchResult.groupValues.size > 4) matchResult.groupValues[4] else " ",
             paramBlock = matchResult.groupValues[3],
-            methodName = matchResult.groupValues[2],
+            name = matchResult.groupValues[2],
         )
     }
 

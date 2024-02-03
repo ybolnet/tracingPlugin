@@ -6,10 +6,11 @@ plugins {
 }
 val ourGroupId = "io.github.ybolnet"
 val ourArtifactId = "traceplugin"
-val ourVersionArtifact = "0.0.13"
+val ourVersionArtifact = "0.0.14"
 val ourPluginName = "TracePlugin"
 val pluginId = ourGroupId
 val pluginMainClass = "com.ybo.trackingplugin.TrackingPlugin"
+val pluginDesc = "gradle plugin allowing to add automatic logs (or other process) at the start of each traced method"
 group = ourGroupId
 version = ourVersionArtifact
 
@@ -26,13 +27,12 @@ gradlePlugin {
             id = pluginId
             implementationClass = pluginMainClass
             displayName = ourPluginName
-            description = "description plugin"
+            description = pluginDesc
         }
     }
 }
 
 val dokkaOutputDir = "$buildDir/dokka"
-val srcOutput = "$buildDir/"
 
 tasks.dokkaHtml {
     outputDirectory.set(file(dokkaOutputDir))
@@ -78,7 +78,7 @@ publishing {
 
                 pom {
                     name.set(ourPluginName)
-                    description.set("Gradle plugin for method logs")
+                    description.set(pluginDesc)
                     url.set("https://github.com/ybolnet/tracingPlugin")
                     properties.set(
                         mapOf(
@@ -119,10 +119,7 @@ publishing {
         repositories {
             maven {
                 url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-                credentials {
-                    username = "héhé"
-                    password = "héhé"
-                }
+                
             }
             maven {
                 name = "test"
@@ -137,50 +134,3 @@ tasks.javadoc {
         (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
     }
 }
-
-/*
-
-publishing {
-    publications {
-        create<MavenPublication>("TracePlugin") {
-            groupId = "io.github.ybolnet"
-            artifactId = "traceplugin"
-            version = "0.0.4"
-            components.forEach {
-                println("TESTACOMP ${it.name}")
-            }
-
-            from(components["kotlin"])
-
-            pom {
-                name.set("TracePlugin")
-                description.set("Gradle plugin for tracing")
-                url.set("https://github.com/ybolnet/tracingPlugin") // Set your project URL
-                developers {
-                    developer {
-
-                        name.set("YBOLNET")
-                        email.set("yannick.bolner@gmaul.com")
-                    }
-                    // Add more developers if needed
-                }
-            }
-            signing {
-                publishing.publications.forEach {
-                    println("TESTACOMP ${it.name}")
-                }
-                sign(publishing.publications["TracePlugin"])
-            }
-        }
-    }
-
-    repositories {
-        maven {
-            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            credentials {
-                username = "héhé"
-                password = "héhé"
-            }
-        }
-    }
-}*/

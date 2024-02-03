@@ -2,11 +2,11 @@ package com.ybo.trackingplugin.tasks.data
 
 import org.gradle.api.GradleException
 
+/** represents a annotation that user put on a method */
 class TraceAnnotationMark(
     private val wholeClass: String?,
     val language: TracedLanguage,
 ) {
-
     val shortVersion: String
         get() {
             if (wholeClass == null) {
