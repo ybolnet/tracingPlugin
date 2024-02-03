@@ -1,30 +1,36 @@
 # tracingPlugin
 Plugin allowing to add automatic logger (or any other process) to every call of methods you annotated with the annotation of your choice.
 
-add to your project with this in build.gradle toplevel:
-
-buildscript {
+add to your project with this in build. toplevel:
+<p>
+   buildscript {
     repositories {
         mavenCentral()
     }
     dependencies {
         classpath ("io.github.ybolnet:traceplugin:VERSION")
     }
-}
+} 
+</p>
+
 
 
 then to app-level build.gradle:
 
-
-plugins {
+<p>
+   plugins {
     ...
     id("io.github.ybolnet")
-}
+} 
+</p>
+
 now you must create in your code a set of 2 annotations that will represent the 2 states of the code: To-Be-Processed and Already-Processed.
 For example :
-
-annotation class SimpleTrace()
+<p>
+    annotation class SimpleTrace()
 annotation class ReverseSimpleTrace()
+</p>
+
 
 The methods annotated with SimpleTrace will be the one producing the tracing logs. The annotation ReverseSimpleTrace will not be used by you but by the plugin, to mark the method it has already processed.
 
@@ -33,15 +39,56 @@ This plugin's job consists in adding a single line at the start of each method a
 So now you have to implement your own tracer to be delegated when a traced method is called:
 
 for example:
-
-package your.package.com
+<p>
+    package your.package.com
 
 import com.ybo.trackingplugin.tracerlib.Tracer
 
+import com.ybo.trackingplugin.tracerlib.Tracer
 
-/** used in build.gradle */
-class TracerFactory_Simple : Tracer.Factory {
+class TraceFactory : Tracer.Factory {
     override fun create(): Tracer {
-        return MyTracer() //<-- here put your implementation of Tracer class.
+        return MyTracerImpl() //<- here your implementation of tracer
     }
 }
+</p>
+
+So now in app build.gradle, you can plug in your tracer and your annotations by writing:
+
+<p>
+
+    tracing{
+    trackables = arrayOf("installDebug") // means that install debug will be traced
+    config{
+        //add a configuration for the couple @Trace/@UnTrace
+        add { 
+            name = "ANameForThisConfig"
+            toBeProcessedAnnotation = "your.package.com.Trace"
+            alreadyProcessedAnnotation = "your.package.com.UnTrace"
+            srcPath = "../app/src/main" // where the source code is
+            tracerFactory = "your.package.com.TraceFactory"
+        }
+        // and actually you can add as much configsthat you want.
+    }
+}
+</p>
+
+and eventually, still in app build.gradle:
+
+<p>
+    dependencies{
+    implementation("io.github.ybolnet:traceplugin:0.0.17")
+    }
+    
+</p>
+After sync, 3 tasks will be added in group traceprocessing:
+- processTrace
+- tracedInstallDebug
+- unprocessTrace
+
+processTrace will edit the code to add the logs.
+unprocessTrace will get it back to what it was.
+tracedInstallDebug will do : processTrace -> installDebug -> unprocessTrace. So can install a traced version of your app on the phone.
+
+
+
