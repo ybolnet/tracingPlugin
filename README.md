@@ -2,7 +2,7 @@
 Plugin allowing to add automatic logger (or any other process) to every call of methods you annotated with the annotation of your choice.
 
 add to your project with this in build. toplevel:
-<p>
+
    ```
    buildscript {
     repositories {
@@ -13,7 +13,6 @@ add to your project with this in build. toplevel:
     }
 } 
    ```
-</p>
 
 
 
