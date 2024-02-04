@@ -1,7 +1,7 @@
 # tracingPlugin
 Plugin allowing to add automatic logger (or any other process) to every call of methods you annotated with the annotation of your choice.
 
-##setup
+## setup
 add to your project with this in toplevel build.gradle :
 
    ```
@@ -173,15 +173,22 @@ class SimplestTracer : Tracer {
 will result in this method:
 ```
 @Trace
-    fun test1(): Int {
+    fun test1(param: Int, param2: Int): Int {
         val v = 2
         return 1
     }
 ```
 
 producing the log: 
+``
+your.package.com.something.test1(1 : java.lang.Integer, 2 : java.lang.Integer)
+``
 
-your.package.com.something.test1() 
+when called like this:
+```
+test1(1,2)
+```
+
 
 ## Questions and clarifications
 
@@ -267,7 +274,8 @@ class SpecialTracerWithReturns : Tracer {
 This would produce with the new tracer the following logs:
 
 ``
-2024-02-04 12:10:33.942 27545-27545 TRACING_WITH_RETURNS    com.ey.ybo.plugincustomer            D   com.ey.ybo.plugincustomer.MainActivity.test1() 
-2024-02-04 12:10:33.943 27545-27545 TRACING_WITH_RETURNS    com.ey.ybo.plugincustomer            D   com.ey.ybo.plugincustomer.MainActivity.test1 returning 1
+2024-02-04 12:10:33.942 27545-27545 TRACING_WITH_RETURNS    your.package.com           D   your.package.com.something.test1() 
+
+2024-02-04 12:10:33.943 27545-27545 TRACING_WITH_RETURNS    your.package.com            D   your.package.com.something.test1 returning 1
 ``
 
