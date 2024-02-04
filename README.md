@@ -274,8 +274,10 @@ class SpecialTracerWithReturns : Tracer {
 This would produce with the new tracer the following logs:
 
 ``
+
 2024-02-04 12:10:33.942 27545-27545 TRACING_WITH_RETURNS    your.package.com           D   your.package.com.something.test1() 
 
 2024-02-04 12:10:33.943 27545-27545 TRACING_WITH_RETURNS    your.package.com            D   your.package.com.something.test1 returning 1
+
 ``
 
