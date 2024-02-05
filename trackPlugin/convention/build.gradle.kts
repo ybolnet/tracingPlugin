@@ -6,11 +6,12 @@ plugins {
 }
 val ourGroupId = "io.github.ybolnet"
 val ourArtifactId = "traceplugin"
-val ourVersionArtifact = "0.0.16"
+val ourVersionArtifact = "0.0.18"
 val ourPluginName = "TracePlugin"
 val pluginId = ourGroupId
 val pluginMainClass = "com.ybo.trackingplugin.TrackingPlugin"
-val pluginDesc = "gradle plugin allowing to add automatic logs (or other process) at the start of each traced method"
+val pluginDesc =
+    "gradle plugin allowing to add automatic logs (or other process) at the start of each traced method"
 group = ourGroupId
 version = ourVersionArtifact
 
@@ -48,7 +49,7 @@ val javadocJar = tasks.register<Jar>("javadocJar") {
     from(dokkaOutputDir)
 }
 val sourcesJar = tasks.register<Jar>("sourcesJar") {
-    dependsOn( tasks.classes)
+    dependsOn(tasks.classes)
     archiveClassifier.set("sources")
     from(java.sourceSets["main"].allSource)
 }
@@ -63,7 +64,6 @@ publishing {
                 from(components["java"])
                 artifact(javadocJar)
                 artifact(sourcesJar)
-                // artifact javadocJar
                 versionMapping {
                     usage("java-api") {
                         fromResolutionOf("runtimeClasspath")
@@ -109,9 +109,10 @@ publishing {
             }
         }
         signing {
-            publishing.publications.forEach {
-                println("TESTACOMP ${it.name}")
-            }
+            val signingKeyId: String? = System.getenv("TRACING_SIGNING_KEY_ID")
+            val signingKey: String? = System.getenv("TRACING_SIGNING_SECRET_KEY")
+            val signingPassword: String? = System.getenv("TRACING_SIGNING_PASSWORD")
+            useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
             sign(publishing.publications[ourPluginName])
         }
     }
@@ -120,8 +121,8 @@ publishing {
             maven {
                 url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
                 credentials {
-                    username = project.properties["ossrhUsername"].toString()
-                    password = project.properties["ossrhPassword"].toString()
+                    username = System.getenv("TRACING_MAVEN_PUBLISH_USERNAME")
+                    password = System.getenv("TRACING_MAVEN_PUBLISH_PASSWORD")
                 }
             }
             maven {
