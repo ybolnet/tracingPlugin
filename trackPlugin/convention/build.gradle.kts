@@ -6,7 +6,7 @@ plugins {
 }
 val ourGroupId = "io.github.ybolnet"
 val ourArtifactId = "traceplugin"
-val ourVersionArtifact = "0.0.18"
+val ourVersionArtifact = "0.1.0"
 val ourPluginName = "TracePlugin"
 val pluginId = ourGroupId
 val pluginMainClass = "com.ybo.trackingplugin.TrackingPlugin"
@@ -80,16 +80,10 @@ publishing {
                     name.set(ourPluginName)
                     description.set(pluginDesc)
                     url.set("https://github.com/ybolnet/tracingPlugin")
-                    properties.set(
-                        mapOf(
-                            "myProp" to "value",
-                            "prop.with.dots" to "anotherValue",
-                        ),
-                    )
                     licenses {
                         license {
-                            name.set("GNU LESSER GENERAL PUBLIC LICENSE 3.0")
-                            url.set("http://www.gnu.org/copyleft/lesser.html")
+                            name.set("MIT licence")
+                            url.set("https://opensource.org/license/mit/")
                         }
                     }
 
