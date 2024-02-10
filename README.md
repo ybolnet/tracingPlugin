@@ -92,7 +92,7 @@ plugins {
 tracing{
     trackables = arrayOf("installDebug") // means that install debug will be traced
     config{
-        //add a configuration for the couple @Trace/@UnTrace
+        //add a configuration for the couple @SimpleTrace/@ReverseSimpleTrace
         add { 
             name = "ANameForThisConfig"
             toBeProcessedAnnotation = "your.package.com.SimpleTrace"
