@@ -37,7 +37,7 @@ android {
         }
     }
 
-    flavorDimensions "environment"
+    flavorDimensions = ["environment"]
 
     productFlavors {
         develop { dimension "environment" }
@@ -76,7 +76,7 @@ dependencies {
     implementation project(":trackinglib")
 
     implementation 'androidx.core:core-ktx:1.8.0'
-    implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.0')
+    implementation platform('org.jetbrains.kotlin:kotlin-bom:1.7.20')
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
     implementation 'androidx.activity:activity-compose:1.5.1'
     implementation platform('androidx.compose:compose-bom:2022.10.00')

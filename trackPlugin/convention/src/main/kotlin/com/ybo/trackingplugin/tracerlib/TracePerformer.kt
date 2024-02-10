@@ -30,13 +30,16 @@ object TracePerformer {
             possiblyObfuscatedMethod = fullMethodNamePossiblyObfuscated,
         )
         historyOfMethods.add(currentMethod)
-        tracer.trace(
+        val invalidateHistory = tracer.trace(
             defaultMessage = makeMessage(java, fullMethodName, paramz),
             java = java,
             method = currentMethod,
             history = historyOfMethods,
             parameterValues = paramz,
         )
+        if (invalidateHistory) {
+            historyOfMethods.clear()
+        }
     }
 
     fun makeMessage(
@@ -53,5 +56,5 @@ object TracePerformer {
         return " $methodName($params) "
     }
 
-    private val historyOfMethods: LimitedSizeList<Tracer.Method> = LimitedSizeList(100)
+    private val historyOfMethods: MutableList<Tracer.Method> = mutableListOf()
 }

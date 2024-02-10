@@ -5,14 +5,16 @@ interface Tracer {
 
     /** called on the call of traced method. To be overriden by user of the plugin.
      * Note that history is maxed at 100. After that the oldest item is discarded.
+     *
+     * returns true if we want to empty the history after tracing the current method
      * */
     fun trace(
         defaultMessage: String,
         java: Boolean,
         method: Method,
-        history: LimitedSizeList<Method>,
+        history: List<Method>,
         parameterValues: Array<Any?>,
-    )
+    ): Boolean
 
     data class Method(
         val originalName: String,
