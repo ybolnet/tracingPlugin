@@ -9,13 +9,16 @@ tracing {
     trackables = ["installDevelopDebug","assembleDevelop"]
     config{
         def annotationPackage = "com.ey.ybo.trackingplugin.annotations"
-        add{conf->
+        addDefaultConfig { conf->
+            conf.srcPath = "../app/src/main"
+        }
+        /*add{conf->
             conf.name = "Trace"
             conf.toBeProcessedAnnotation = "${annotationPackage}.Trace"
             conf.alreadyProcessedAnnotation = "${annotationPackage}.UnTrace"
             conf.srcPath = "../app/src/main"
             conf.tracerFactory = "${annotationPackage}.tracers.TracerFactory_WithReturns"
-        }
+        }*/
     }
 
 }
@@ -73,8 +76,7 @@ android {
 
 dependencies {
 
-    implementation project(":trackinglib")
-
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.core:core-ktx:1.8.0'
     implementation platform('org.jetbrains.kotlin:kotlin-bom:1.7.20')
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'

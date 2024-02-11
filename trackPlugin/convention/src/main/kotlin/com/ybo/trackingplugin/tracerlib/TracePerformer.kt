@@ -9,6 +9,7 @@ object TracePerformer {
         method: String,
         java: Boolean,
         paramz: Array<Any?>,
+        alterationOffset: Int,
     ) {
         val tracer = tracerFactory.create()
         val throwable = Throwable()
@@ -25,9 +26,18 @@ object TracePerformer {
             (stackElement?.className ?: "") +
                 "." + stackElement?.methodName
             )
+        val line = stackElement?.lineNumber?.let {
+            (it - alterationOffset).coerceAtLeast(0)
+        } ?: 0
+
+        val stringLink = stackElement?.fileName?.let {
+            "$it:$line"
+        } ?: ""
+
         val currentMethod = Tracer.Method(
             originalName = fullMethodName,
             possiblyObfuscatedMethod = fullMethodNamePossiblyObfuscated,
+            link = stringLink,
         )
         historyOfMethods.add(currentMethod)
         val invalidateHistory = tracer.trace(

@@ -1,5 +1,8 @@
 package com.ybo.trackingplugin.extension
 
+import com.ybo.trackingplugin.tracerlib.defaulttracer.DefTraceTest
+import com.ybo.trackingplugin.tracerlib.defaulttracer.DefUnTraceTest
+import com.ybo.trackingplugin.tracerlib.defaulttracer.tracers.TraceDefaultFactory
 import org.gradle.api.GradleException
 
 open class TraceProcessConfigHandler {
@@ -11,6 +14,22 @@ open class TraceProcessConfigHandler {
      * and a factory to create a tracer for these traced methods.*/
     fun add(init: TraceConfig.() -> Unit) {
         val config = TraceConfig()
+        config.init()
+        config.check()
+        config.checkInsertability(editableListOfConfigs)
+        editableListOfConfigs.add(config)
+    }
+
+    /** adds a configuration,
+     * but that is already prepopulated with default @DefTraceTest annotations*/
+    fun addDefaultConfig(init: TraceConfig.() -> Unit) {
+        val config = TraceConfig()
+        config.apply {
+            name = "DefaultEmbeddedConfig"
+            tracerFactory = TraceDefaultFactory::class.java.canonicalName
+            toBeProcessedAnnotation = DefTraceTest::class.java.canonicalName
+            alreadyProcessedAnnotation = DefUnTraceTest::class.java.canonicalName
+        }
         config.init()
         config.check()
         config.checkInsertability(editableListOfConfigs)

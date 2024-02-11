@@ -10,12 +10,14 @@ class _CodeGeneratorJava : CodeGenerator() {
         insideMethodIndentation: String,
         methodName: String,
         tag: String,
+        alterationOffset: Int,
     ): String {
         return "/*$tag*/ $tracePerformerPackage.INSTANCE.trace(" +
             "new " + tracerFactoryString + "(), " +
             "\"" + methodName.toB64() + "\", " +
             "true, " +
-            "new Object[]{" + params + "} " +
+            "new Object[]{" + params + "}, " +
+            alterationOffset +
             ");\n" +
             insideMethodIndentation
     }

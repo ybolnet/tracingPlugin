@@ -19,6 +19,7 @@ interface Tracer {
     data class Method(
         val originalName: String,
         val possiblyObfuscatedMethod: String,
+        val link: String = "",
     )
 
     /** factory for Tracers. */

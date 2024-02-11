@@ -10,12 +10,14 @@ class _CodeGeneratorKotlin : CodeGenerator() {
         insideMethodIndentation: String,
         methodName: String,
         tag: String,
+        alterationOffset: Int,
     ): String {
         return "/*$tag*/ $tracePerformerPackage.trace(" +
             tracerFactoryString + "(), " +
             "\"" + methodName.toB64() + "\", " +
             "false, " +
-            params.paramsOrNot() +")\n" +
+            params.paramsOrNot() + "," +
+            alterationOffset + ")\n" +
             insideMethodIndentation
     }
 

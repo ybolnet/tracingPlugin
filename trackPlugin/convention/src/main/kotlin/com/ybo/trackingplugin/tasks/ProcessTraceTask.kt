@@ -1,6 +1,7 @@
 package com.ybo.trackingplugin.tasks
 
 import com.ybo.trackingplugin.tasks.data.TraceAnnotationMark
+import com.ybo.trackingplugin.tasks.data.TracedMethod
 import com.ybo.trackingplugin.tasks.utils.TextExtractor
 import com.ybo.trackingplugin.tasks.utils.createCodeGenerator
 import com.ybo.trackingplugin.tasks.utils.createPatternProducerForTracedMethods
@@ -17,6 +18,7 @@ open class ProcessTraceTask : BrowsingTask() {
 
     @TaskAction
     fun processTrace() {
+        alterationsMap = mutableMapOf<String, Int>()
         browseCode { tracked, config ->
             if (config.srcPath == null) {
                 throw GradleException("srcPath must be defined")
@@ -35,7 +37,7 @@ open class ProcessTraceTask : BrowsingTask() {
         mark: TraceAnnotationMark,
         processed: TraceAnnotationMark,
         tracerFactortStr: String,
-    ): Boolean {
+    ): Int {
         val tag = TraceProcessingParams.TAG
         var text = file.readText()
         val codeGenerator = createCodeGenerator(mark.language)
@@ -50,8 +52,9 @@ open class ProcessTraceTask : BrowsingTask() {
 
         val tracedMethods = methodExtractor.extract(text) // extractTracedMethods(text, mark)
         if (tracedMethods.isEmpty()) {
-            return false
+            return 0
         }
+        var indexOfTraceInFile = 0
         println("processing trace for file " + file.name)
         for (method in tracedMethods) {
             try {
@@ -63,6 +66,8 @@ open class ProcessTraceTask : BrowsingTask() {
                     .replace(mark.shortVersion, processed.longVersion)
                     .replace(mark.longVersion, processed.longVersion)
 
+                val alterationOffsetForThisMethod =
+                    getMethodAlterationOffset(method, file) + indexOfTraceInFile
                 text = text.replace(
                     method.wholeSignature,
                     newLine + codeGenerator.generate(
@@ -71,8 +76,12 @@ open class ProcessTraceTask : BrowsingTask() {
                         insideMethodIndentation = method.indentationInsideMethod,
                         methodName = method.name,
                         tag = tag,
+                        alterationOffset = alterationOffsetForThisMethod,
                     ),
                 )
+
+                indexOfTraceInFile++
+                setMethodAlterationOffset(method,file,alterationOffsetForThisMethod)
             } catch (error: GradleException) {
                 error.printStackTrace()
                 println("skipping method ${method.name}...")
@@ -80,6 +89,20 @@ open class ProcessTraceTask : BrowsingTask() {
         }
         file.writeText(text)
         println("processing trace done for file " + file.name)
-        return true
+        return indexOfTraceInFile
+    }
+
+    fun setMethodAlterationOffset(method: TracedMethod, file: File, offset: Int) {
+        val key = method.wholeSignature + file.name
+        alterationsMap[key] = offset
+    }
+
+    fun getMethodAlterationOffset(method: TracedMethod, file: File): Int {
+        val key = method.wholeSignature + file.name
+        return alterationsMap[key] ?: 0
+    }
+
+    companion object {
+        var alterationsMap = mutableMapOf<String, Int>()
     }
 }

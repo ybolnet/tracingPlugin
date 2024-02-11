@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.ey.ybo.trackingplugin.annotations.Trace
 import com.ey.ybo.trackingplugin.ui.theme.TrackingPluginTheme
+import com.ybo.trackingplugin.tracerlib.defaulttracer.DefTraceTest
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +34,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Trace
+@DefTraceTest
 fun test(p1: Int, p2: Double, p3: Int = 4): Int {
     android.util.Log.d("TESTO", "TESTIL")
     val b: Int = p1
@@ -40,16 +42,19 @@ fun test(p1: Int, p2: Double, p3: Int = 4): Int {
 }
 
 @Trace
+@DefTraceTest
 fun test2() {
     val b: Int = 1
 }
 
 @Trace
+@DefTraceTest
 private fun test3() {
     val b: Int = 1
 }
 
 @Trace
+@DefTraceTest
 private fun test4() {
     val b: Int = 1
 }

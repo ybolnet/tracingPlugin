@@ -12,5 +12,6 @@ abstract class CodeGenerator {
         insideMethodIndentation: String,
         methodName: String,
         tag: String,
+        alterationOffset: Int,
     ): String
 }
