@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.ey.ybo.trackingplugin.annotations.Bullshit
 import com.ey.ybo.trackingplugin.annotations.Trace
 import com.ey.ybo.trackingplugin.ui.theme.TrackingPluginTheme
 import com.ybo.trackingplugin.tracerlib.defaulttracer.DefTraceTest
@@ -19,6 +20,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         test(1, 2.2)
         test2()
+        testar @Bullshit @DefTraceTest @Trace
+        { b ->
+            val v = 1
+        }
         setContent {
             TrackingPluginTheme {
                 // A surface container using the 'background' color from the theme
@@ -33,7 +38,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Trace
 @DefTraceTest
 fun test(p1: Int, p2: Double, p3: Int = 4): Int {
     android.util.Log.d("TESTO", "TESTIL")
@@ -41,19 +45,21 @@ fun test(p1: Int, p2: Double, p3: Int = 4): Int {
     return (p1 + 1)
 }
 
-@Trace
 @DefTraceTest
 fun test2() {
     val b: Int = 1
 }
 
-@Trace
+@DefTraceTest
+fun testar(block: (a: Int) -> Unit) {
+    block.invoke(1)
+}
+
 @DefTraceTest
 private fun test3() {
     val b: Int = 1
 }
 
-@Trace
 @DefTraceTest
 private fun test4() {
     val b: Int = 1
@@ -64,6 +70,7 @@ fun interface IntPredicate {
 }
 
 @Composable
+@DefTraceTest
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     test2()
     Text(
@@ -72,6 +79,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     )
 }
 
+@DefTraceTest
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
@@ -80,7 +88,7 @@ fun GreetingPreview() {
     }
 }
 
-@Trace
+@DefTraceTest
 inline fun <T> MainActivity.testExtension(p1: Int, p2: Int = 2): Double {
     return 0.0
 }

@@ -1,8 +1,11 @@
 package com.ybo.trackingplugin.tasks.utils
 
-class TextExtractor<ObjectToExtract>(
-    private val patternProducer: PatternProducer,
-    private val patternSearcher: PatternSearcher<ObjectToExtract>,
+import com.ybo.trackingplugin.tasks.utils.impl.patterns.PatternName
+
+class TextExtractor<ObjectToExtract, out T : PatternName>(
+    private val patternProducer: PatternProducer<T>,
+    private val patternSearcher: PatternSearcher<ObjectToExtract, T>,
+    private val resultSorter: ResultSorter<ObjectToExtract> = NoSortSorter(),
 ) {
 
     fun extract(
@@ -14,8 +17,21 @@ class TextExtractor<ObjectToExtract>(
             .let { producedPatterns ->
                 println("search pattern: $producedPatterns")
                 patternSearcher.search(text, producedPatterns)
-            }.flatMap {
-                it.results
+            }.flatMap { group ->
+                println("process pattern $group")
+                group.results
+            }.let {
+                println("sorting results $it")
+                resultSorter.sort(it)
+            }.also {
+                println("sorted $it")
+                println("sorted done")
             }
+    }
+
+    private class NoSortSorter<T> : ResultSorter<T> {
+        override fun sort(list: List<T>): List<T> {
+            return list
+        }
     }
 }

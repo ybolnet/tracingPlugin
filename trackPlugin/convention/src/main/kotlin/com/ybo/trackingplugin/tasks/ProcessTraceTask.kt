@@ -8,6 +8,7 @@ import com.ybo.trackingplugin.tasks.utils.createPatternProducerForTracedMethods
 import com.ybo.trackingplugin.tasks.utils.createPatternProducerForTracedParams
 import com.ybo.trackingplugin.tasks.utils.createPatternSearcherForTracedMethods
 import com.ybo.trackingplugin.tasks.utils.createPatternSearcherForTracedParams
+import com.ybo.trackingplugin.tasks.utils.impl.patterns.sorters.MethodsSorter
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import java.io.File
@@ -44,20 +45,28 @@ open class ProcessTraceTask : BrowsingTask() {
         val methodExtractor = TextExtractor(
             patternProducer = createPatternProducerForTracedMethods(mark),
             patternSearcher = createPatternSearcherForTracedMethods(mark),
+            resultSorter = MethodsSorter(text),
         )
-        val paramsExtractor = TextExtractor(
-            patternProducer = createPatternProducerForTracedParams(mark.language),
-            patternSearcher = createPatternSearcherForTracedParams(mark.language),
-        )
-
-        val tracedMethods = methodExtractor.extract(text) // extractTracedMethods(text, mark)
+        val tracedMethods = methodExtractor.extract(text)
         if (tracedMethods.isEmpty()) {
+            println("no traced methods.")
             return 0
         }
         var indexOfTraceInFile = 0
         println("processing trace for file " + file.name)
         for (method in tracedMethods) {
+            println("processing method ${method.name} pattern ${method.patternType} ${mark.shortVersion} ")
             try {
+                val paramsExtractor = TextExtractor(
+                    patternProducer = createPatternProducerForTracedParams(
+                        mark.language,
+                        method.patternType,
+                    ),
+                    patternSearcher = createPatternSearcherForTracedParams(
+                        mark.language,
+                        method.patternType,
+                    ),
+                )
                 val paramsStr = paramsExtractor
                     .extract(method.paramBlock)
                     .joinToString(", ") { it.name }
@@ -66,6 +75,8 @@ open class ProcessTraceTask : BrowsingTask() {
                     .replace(mark.shortVersion, processed.longVersion)
                     .replace(mark.longVersion, processed.longVersion)
 
+                val alto = getMethodAlterationOffset(method, file)
+                println("alterationOffset = $alto + $indexOfTraceInFile for file ${file.name} and method ${method.name}")
                 val alterationOffsetForThisMethod =
                     getMethodAlterationOffset(method, file) + indexOfTraceInFile
                 text = text.replace(
@@ -81,7 +92,7 @@ open class ProcessTraceTask : BrowsingTask() {
                 )
 
                 indexOfTraceInFile++
-                setMethodAlterationOffset(method,file,alterationOffsetForThisMethod)
+                setMethodAlterationOffset(method, file, alterationOffsetForThisMethod)
             } catch (error: GradleException) {
                 error.printStackTrace()
                 println("skipping method ${method.name}...")

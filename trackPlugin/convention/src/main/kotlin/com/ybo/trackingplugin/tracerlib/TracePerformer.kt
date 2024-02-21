@@ -20,8 +20,13 @@ object TracePerformer {
                 null
             }
         }
+        val methodNameToTheBestOfKnowledge = if(method.isNotBlank()) {
+            method.decodedFromB64()
+        } else {
+            stackElement?.methodName ?: ""
+        }
         val fullMethodName = (stackElement?.className ?: "") +
-            "." + method.decodedFromB64()
+            "." + methodNameToTheBestOfKnowledge
         val fullMethodNamePossiblyObfuscated = (
             (stackElement?.className ?: "") +
                 "." + stackElement?.methodName

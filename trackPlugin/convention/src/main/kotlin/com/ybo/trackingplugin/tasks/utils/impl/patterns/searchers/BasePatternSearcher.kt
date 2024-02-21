@@ -1,23 +1,20 @@
-package com.ybo.trackingplugin.tasks.utils.impl
+package com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers
 
 import com.ybo.trackingplugin.tasks.data.PatternToSearch
-import com.ybo.trackingplugin.tasks.utils.PatternProducer
 import com.ybo.trackingplugin.tasks.utils.PatternSearcher
+import com.ybo.trackingplugin.tasks.utils.impl.patterns.PatternName
+import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.PatternResolver
 
-abstract class _PatternProducerSearcher<SearchedResult> :
-    PatternProducer,
-    PatternSearcher<SearchedResult> {
-
-    abstract fun createSearchedResult(
-        matchResult: MatchResult,
-        patternName: String,
-    ): SearchedResult
+internal open class BasePatternSearcher<out SearchedResult, in PatternType : PatternName>(
+    private val resolver: PatternResolver<SearchedResult, PatternType>,
+) : PatternSearcher<SearchedResult, PatternType> {
 
     override fun search(
         text: String,
-        patterns: List<PatternToSearch>,
+        patterns: List<PatternToSearch<PatternType>>,
     ): List<PatternSearcher.GroupOfResult<SearchedResult>> {
         return patterns.mapNotNull { pattern ->
+            println(" pattern to process $pattern ")
             val matcher = pattern.regex().findAll(text)
             if (matcher.count() == 0) {
                 println("nothing interesting here")
@@ -26,7 +23,7 @@ abstract class _PatternProducerSearcher<SearchedResult> :
                 PatternSearcher.GroupOfResult(
                     patternName = pattern.name,
                     results = matcher
-                        .map { createSearchedResult(it, pattern.name) }
+                        .map { resolver.resolve(it, pattern.name) }
                         .toList(),
                 )
             }
