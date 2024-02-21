@@ -2,6 +2,11 @@ package com.ybo.trackingplugin.tasks.utils
 
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.PatternName
 
+/**
+ * object than has some patterns to search in text, and extract their manifestation in the text
+ * as objects.
+ *It delivers them as a sorted list.
+ */
 class TextExtractor<ObjectToExtract, out T : PatternName>(
     private val patternProducer: PatternProducer<T>,
     private val patternSearcher: PatternSearcher<ObjectToExtract, T>,

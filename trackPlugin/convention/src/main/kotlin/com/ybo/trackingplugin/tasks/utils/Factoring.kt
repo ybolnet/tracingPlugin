@@ -17,6 +17,7 @@ import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.BasePatternSea
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.KotlinAndJavaMethodNormalResolver
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.KotlinAndJavaMethodResolver
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.KotlinAndJavaParamResolver
+import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.KotlinMethodHigherOrderNoParamsResolver
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.KotlinMethodHigherOrderResolver
 import org.gradle.api.GradleException
 
@@ -46,6 +47,7 @@ fun createPatternSearcherForTracedMethods(
             KotlinAndJavaMethodResolver(
                 normalResolver = KotlinAndJavaMethodNormalResolver(),
                 higherOrderResolver = KotlinMethodHigherOrderResolver(),
+                higherOrderNoParamsResolver = KotlinMethodHigherOrderNoParamsResolver(),
             ),
         )
 

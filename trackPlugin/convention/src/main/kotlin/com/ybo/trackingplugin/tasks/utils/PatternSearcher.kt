@@ -4,7 +4,7 @@ import com.ybo.trackingplugin.tasks.data.PatternToSearch
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.PatternName
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.PatternResolver
 
-/** search a pattern ([PatternToSearch]) in text and returns found data objects.
+/** searches patterns ([PatternToSearch]) in text and returns found data objects.
  * the data objects are usually created by a [PatternResolver]
  * the patterns are usually created by a [PatternProducer]
  * */

@@ -12,6 +12,7 @@ class KotlinParamPatternProducer(
 ) : PatternProducer<KotlinParamPatternName> {
     override fun produce(): List<PatternToSearch<KotlinParamPatternName>> {
         return when (methodType) {
+            KotlinMethodPatternName.KotlinHigherOrderFunctionWithNoParams,
             KotlinMethodPatternName.KotlinHigherOrderFunctionWithParams,
             -> listOf(
                 KotlinParamHigherOrderFunctionPattern(),

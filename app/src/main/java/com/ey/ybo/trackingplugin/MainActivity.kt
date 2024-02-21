@@ -20,8 +20,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         test(1, 2.2)
         test2()
-        testar @Bullshit @DefTraceTest @Trace
-        { b ->
+        testar(1, 2) @Bullshit @DefTraceTest @Trace { b ->
+            val v = 1
+        }
+
+        testarde(1, 2) @Bullshit @DefTraceTest @Trace {
             val v = 1
         }
         setContent {
@@ -51,8 +54,13 @@ fun test2() {
 }
 
 @DefTraceTest
-fun testar(block: (a: Int) -> Unit) {
+fun testar(b: Int, c: Int, block: (a: Int) -> Unit) {
     block.invoke(1)
+}
+
+@DefTraceTest
+fun testarde(b: Int, c: Int, block: () -> Unit) {
+    block.invoke()
 }
 
 @DefTraceTest

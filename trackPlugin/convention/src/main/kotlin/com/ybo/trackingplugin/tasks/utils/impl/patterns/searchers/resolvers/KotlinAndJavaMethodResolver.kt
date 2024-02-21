@@ -8,6 +8,7 @@ import com.ybo.trackingplugin.tasks.utils.impl.patterns.MethodPatternNames
 internal class KotlinAndJavaMethodResolver(
     private val normalResolver: KotlinAndJavaMethodNormalResolver,
     private val higherOrderResolver: KotlinMethodHigherOrderResolver,
+    private val higherOrderNoParamsResolver: KotlinMethodHigherOrderNoParamsResolver,
 ) :
     PatternResolver<TracedMethod, MethodPatternNames> {
 
@@ -24,6 +25,12 @@ internal class KotlinAndJavaMethodResolver(
 
             KotlinMethodPatternName.KotlinHigherOrderFunctionWithParams ->
                 higherOrderResolver.resolve(matchResult, patternName as KotlinMethodPatternName)
+
+            KotlinMethodPatternName.KotlinHigherOrderFunctionWithNoParams ->
+                higherOrderNoParamsResolver.resolve(
+                    matchResult,
+                    patternName as KotlinMethodPatternName,
+                )
         }
     }
 }
