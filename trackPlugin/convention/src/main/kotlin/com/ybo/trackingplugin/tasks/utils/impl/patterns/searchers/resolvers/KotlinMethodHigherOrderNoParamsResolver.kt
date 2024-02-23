@@ -9,7 +9,6 @@ internal class KotlinMethodHigherOrderNoParamsResolver : PatternResolver<TracedM
         matchResult: MatchResult,
         patternName: KotlinMethodPatternName,
     ): TracedMethod {
-        println("resolving HONP method ${matchResult.groupValues}")
         return TracedMethod(
             wholeSignature = matchResult.groupValues[0],
             indentationInsideMethod = if (matchResult.groupValues.size > 3) matchResult.groupValues[3] else " ",

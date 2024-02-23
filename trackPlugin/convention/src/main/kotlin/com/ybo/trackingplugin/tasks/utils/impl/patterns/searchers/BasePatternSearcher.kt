@@ -14,10 +14,8 @@ internal open class BasePatternSearcher<out SearchedResult, in PatternType : Pat
         patterns: List<PatternToSearch<PatternType>>,
     ): List<PatternSearcher.GroupOfResult<SearchedResult>> {
         return patterns.mapNotNull { pattern ->
-            println(" pattern to process $pattern ")
             val matcher = pattern.regex().findAll(text)
             if (matcher.count() == 0) {
-                println("nothing interesting here")
                 null
             } else {
                 PatternSearcher.GroupOfResult(

@@ -11,15 +11,8 @@ internal class MethodsSorter(private val text: String) : ResultSorter<TracedMeth
             .removeRepetitions()
             .sortedBy {
                 it.line
-                    .also { nth ->
-                        println(" ${it.method.name} is at line $nth")
-                    }
             }.map {
                 it.method
-            }.also {
-                println("initalsort: before $list")
-                println("----------------------")
-                println("initalsort: after $it")
             }
     }
 

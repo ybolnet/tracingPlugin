@@ -64,12 +64,12 @@ fun testarde(b: Int, c: Int, block: () -> Unit) {
 }
 
 @DefTraceTest
-private fun test3() {
+fun test3() {
     val b: Int = 1
 }
 
 @DefTraceTest
-private fun test4() {
+private suspend fun test4() {
     val b: Int = 1
 }
 

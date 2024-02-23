@@ -9,7 +9,6 @@ internal class KotlinMethodHigherOrderResolver : PatternResolver<TracedMethod, K
         matchResult: MatchResult,
         patternName: KotlinMethodPatternName,
     ): TracedMethod {
-        println("resolving HO method ${matchResult.groupValues}")
         return TracedMethod(
             wholeSignature = matchResult.groupValues[0],
             indentationInsideMethod = if (matchResult.groupValues.size > 4) matchResult.groupValues[4] else " ",

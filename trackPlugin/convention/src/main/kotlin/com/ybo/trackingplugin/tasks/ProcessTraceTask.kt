@@ -49,11 +49,9 @@ open class ProcessTraceTask : BrowsingTask() {
         )
         val tracedMethods = methodExtractor.extract(text)
         if (tracedMethods.isEmpty()) {
-            println("no traced methods.")
             return 0
         }
         var indexOfTraceInFile = 0
-        println("processing trace for file " + file.name)
         for (method in tracedMethods) {
             println("processing method ${method.name} pattern ${method.patternType} ${mark.shortVersion} ")
             try {

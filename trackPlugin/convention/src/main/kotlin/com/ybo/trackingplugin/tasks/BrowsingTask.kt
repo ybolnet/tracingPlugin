@@ -26,7 +26,6 @@ open class BrowsingTask : DefaultTask() {
 
     fun browseCode(block: (file: TrackedFile, conf: TraceConfig) -> Unit) {
         listOfConfigs.forEach { config ->
-            println("iterating through files for config $config")
             val fileTree: FileTree =
                 project.fileTree(config.srcPath + "")
                     .matching {
@@ -38,9 +37,7 @@ open class BrowsingTask : DefaultTask() {
                     }
 
             fileTree.forEach {
-                println("handling file ${it.name}")
                 if (it.canRead()) {
-                    println("file ${it.name} is readable, let's process it")
                     val processedMarkToTrack =
                         TraceAnnotationMark(config.alreadyProcessedAnnotation, it.getLanguage())
                     val toBeProcessedMarkToTrack =

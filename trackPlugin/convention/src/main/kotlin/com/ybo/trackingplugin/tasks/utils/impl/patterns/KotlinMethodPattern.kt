@@ -14,7 +14,7 @@ internal open class KotlinMethodPattern(
     override val name: KotlinMethodPatternName = KotlinMethodPatternName.KotlinNormalMethod
     open val fillerAnnotations: String = "(?:\\s*@[\\w\\.]*(?:\\(.*\\))?\\s*)"//"(?:\\s*@[^\\n]*\\s*\\n*)"
     open val preFunKeywords: String =
-        "(?:override\\s+|inline\\s+|private\\s+|public\\s+|protected\\s+)"
+        "(?:override\\s+|inline\\s+|private\\s+|public\\s+|protected\\s+|suspend\\s+)"
     open val funKeyword: String = "fun"
     open val generics: String = "(?:\\s*<\\s*\\w*\\s*>\\s*)"
     open val methodName: String = "\\w+"
