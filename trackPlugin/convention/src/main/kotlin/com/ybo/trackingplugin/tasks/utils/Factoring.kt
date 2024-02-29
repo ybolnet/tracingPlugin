@@ -14,6 +14,7 @@ import com.ybo.trackingplugin.tasks.utils.impl.patterns.producers.JavaParamPatte
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.producers.KotlinMethodPatternProducer
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.producers.KotlinParamPatternProducer
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.BasePatternSearcher
+import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.repetitionHandler.TraceMethodHitDistinguisher
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.KotlinAndJavaMethodNormalResolver
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.KotlinAndJavaMethodResolver
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.KotlinAndJavaParamResolver
@@ -44,11 +45,12 @@ fun createPatternSearcherForTracedMethods(
     return when (markToLookFor.language) {
         TracedLanguage.KOTLIN, TracedLanguage.JAVA,
         -> BasePatternSearcher(
-            KotlinAndJavaMethodResolver(
+            resolver = KotlinAndJavaMethodResolver(
                 normalResolver = KotlinAndJavaMethodNormalResolver(),
                 higherOrderResolver = KotlinMethodHigherOrderResolver(),
                 higherOrderNoParamsResolver = KotlinMethodHigherOrderNoParamsResolver(),
             ),
+            hitDistinguisher = TraceMethodHitDistinguisher(),
         )
 
         TracedLanguage.OTHER -> throw GradleException("unknown language")

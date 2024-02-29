@@ -1,5 +1,6 @@
 package com.ybo.trackingplugin.tasks.utils
 
+import com.ybo.trackingplugin.tasks.data.TraceAnnotationMark
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.PatternName
 
 /**
@@ -15,11 +16,12 @@ class TextExtractor<ObjectToExtract, out T : PatternName>(
 
     fun extract(
         text: String,
+        mark: TraceAnnotationMark? = null,
     ): List<ObjectToExtract> {
         return patternProducer
             .produce()
             .let { producedPatterns ->
-                patternSearcher.search(text, producedPatterns)
+                patternSearcher.search(text, producedPatterns, mark)
             }.flatMap { group ->
                 group.results
             }.let {

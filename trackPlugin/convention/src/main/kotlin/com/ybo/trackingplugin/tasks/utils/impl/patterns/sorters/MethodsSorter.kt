@@ -11,6 +11,9 @@ internal class MethodsSorter(private val text: String) : ResultSorter<TracedMeth
             .removeRepetitions()
             .sortedBy {
                 it.line
+            }.also {
+                println("SORTING before ${list.map { it.name }}")
+                println("SORTING after ${it.map { it.method.name + " l=" + it.line }}")
             }.map {
                 it.method
             }
@@ -64,6 +67,7 @@ internal class MethodsSorter(private val text: String) : ResultSorter<TracedMeth
     }
 
     private fun calculateLine(text: String, needle: String, n: Int): Int {
+        println("CALCULATE: $needle  $n")
         val needleNb = countOccurrences(text, needle)
         return if (needleNb > 0 && needleNb >= n && n > 0) {
             val subtexts = text.split(needle)
@@ -73,6 +77,7 @@ internal class MethodsSorter(private val text: String) : ResultSorter<TracedMeth
                 nbLines += subText.filter { it == '\n' }.length
             }
             nbLines += (n - 1) * needle.filter { it == '\n' }.length
+            println("CALCULATE: returning $nbLines")
             nbLines
         } else {
             -1

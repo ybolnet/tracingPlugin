@@ -12,19 +12,23 @@ internal open class KotlinMethodPattern(
 ) : PatternToSearch<KotlinMethodPatternName> {
 
     override val name: KotlinMethodPatternName = KotlinMethodPatternName.KotlinNormalMethod
-    open val fillerAnnotations: String = "(?:\\s*@[\\w\\.]*(?:\\(.*\\))?\\s*)"//"(?:\\s*@[^\\n]*\\s*\\n*)"
+    open val fillerAnnotations: String =
+        "(?:\\s*@[\\w\\.]*(?:\\(.*\\))?\\s*)" // "(?:\\s*@[^\\n]*\\s*\\n*)"
     open val preFunKeywords: String =
         "(?:override\\s+|inline\\s+|private\\s+|public\\s+|protected\\s+|suspend\\s+)"
     open val funKeyword: String = "fun"
     open val generics: String = "(?:\\s*<\\s*\\w*\\s*>\\s*)"
     open val methodName: String = "\\w+"
-    open val paramsWithCapture: String = "\\(([^)]*)\\)"
+    open val paramsWithCapture: String =
+        "\\((\\s*(?:\\w*\\s*:\\s*[\\w\\.]*(?:\\(.*\\)\\s*->\\s*[\\w\\.]*)?(?:\\s*=\\s*.*)?,?\\s*)*\\s*)\\)"
+
+    // "\\(([^)]*)\\)"
     open val returnType: String = "(?::\\s*\\w+)"
     open val insideIndentation: String = "\\s*"
 
     open fun getTraceAnnotation(): String {
         val shortVersion = markToLookFor.shortVersion
-        val longVersion = markToLookFor.longVersion.replace(".","\\.")
+        val longVersion = markToLookFor.longVersion.replace(".", "\\.")
         return "$shortVersion|$longVersion"
     }
 

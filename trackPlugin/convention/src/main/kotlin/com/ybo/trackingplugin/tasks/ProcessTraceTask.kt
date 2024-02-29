@@ -17,10 +17,15 @@ import java.io.File
  * counterpart of [UnprocessTraceTask]*/
 open class ProcessTraceTask : BrowsingTask() {
 
+
+
     @TaskAction
     fun processTrace() {
         alterationsMap = mutableMapOf<String, Int>()
+        startTime = System.currentTimeMillis()
         browseCode { tracked, config ->
+            println("starting browsing took " + (System.currentTimeMillis() - startTime))
+            startTime = System.currentTimeMillis()
             if (config.srcPath == null) {
                 throw GradleException("srcPath must be defined")
             }
@@ -41,14 +46,20 @@ open class ProcessTraceTask : BrowsingTask() {
     ): Int {
         val tag = TraceProcessingParams.TAG
         var text = file.readText()
+        println("reading file ${file.name} took " + (System.currentTimeMillis() - startTime))
+        startTime = System.currentTimeMillis()
         val codeGenerator = createCodeGenerator(mark.language)
         val methodExtractor = TextExtractor(
             patternProducer = createPatternProducerForTracedMethods(mark),
             patternSearcher = createPatternSearcherForTracedMethods(mark),
             resultSorter = MethodsSorter(text),
         )
-        val tracedMethods = methodExtractor.extract(text)
+        println("creating stuff took " + (System.currentTimeMillis() - startTime))
+        startTime = System.currentTimeMillis()
+        val tracedMethods = methodExtractor.extract(text, mark)
+        println("extracting took " + (System.currentTimeMillis() - startTime))
         if (tracedMethods.isEmpty()) {
+            println("no traced methods")
             return 0
         }
         var indexOfTraceInFile = 0
@@ -65,9 +76,11 @@ open class ProcessTraceTask : BrowsingTask() {
                         method.patternType,
                     ),
                 )
+                startTime = System.currentTimeMillis()
                 val paramsStr = paramsExtractor
                     .extract(method.paramBlock)
                     .joinToString(", ") { it.name }
+                println("extracting params " + (System.currentTimeMillis() - startTime))
 
                 val newLine = (method.wholeSignature + "")
                     .replace(mark.shortVersion, processed.longVersion)
@@ -113,5 +126,6 @@ open class ProcessTraceTask : BrowsingTask() {
 
     companion object {
         var alterationsMap = mutableMapOf<String, Int>()
+        private var startTime: Long = 0L
     }
 }

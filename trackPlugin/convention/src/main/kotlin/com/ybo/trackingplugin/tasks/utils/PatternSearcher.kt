@@ -1,6 +1,7 @@
 package com.ybo.trackingplugin.tasks.utils
 
 import com.ybo.trackingplugin.tasks.data.PatternToSearch
+import com.ybo.trackingplugin.tasks.data.TraceAnnotationMark
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.PatternName
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.PatternResolver
 
@@ -10,9 +11,13 @@ import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.Patt
  * */
 interface PatternSearcher<out ResultType, in PatternType : PatternName> {
 
+    /**
+     * searches patterns in text in parameter
+     */
     fun search(
         text: String,
         patterns: List<PatternToSearch<PatternType>>,
+        mark: TraceAnnotationMark? = null,
     ): List<GroupOfResult<ResultType>>
 
     data class GroupOfResult<out ResultType>(
