@@ -9,7 +9,7 @@ import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.Patt
 
 internal open class BasePatternSearcher<out PatternHitType, in PatternType : PatternName>(
     private val resolver: PatternResolver<PatternHitType, PatternType>,
-    private val hitDistinguisher: PatternHitDistinguisher<PatternHitType> = AlwaysNoDistinguisher<PatternHitType>(),
+    private val hitDistinguisher: PatternHitDistinguisher<PatternHitType> = DummyHitDistinguisher(),
 ) : PatternSearcher<PatternHitType, PatternType> {
 
     override fun search(
@@ -93,9 +93,9 @@ internal open class BasePatternSearcher<out PatternHitType, in PatternType : Pat
         return text.windowed(substring.length, 1) { it }.count { it == substring }
     }
 
-    private class AlwaysNoDistinguisher<T> : PatternHitDistinguisher<T> {
-        override fun generateUniqueId(result1: T, text: String): Any {
-            return result1 as Any
+    private class DummyHitDistinguisher<T> : PatternHitDistinguisher<T> {
+        override fun generateUniqueId(patternHit: T, text: String): Any {
+            return patternHit as Any
         }
 
         data class DefaultKey(private val int: Int)
