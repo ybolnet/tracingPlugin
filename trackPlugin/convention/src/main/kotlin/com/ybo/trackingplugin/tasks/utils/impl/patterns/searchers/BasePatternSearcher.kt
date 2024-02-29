@@ -17,7 +17,7 @@ internal open class BasePatternSearcher<out PatternHitType, in PatternType : Pat
         patterns: List<PatternToSearch<PatternType>>,
         mark: TraceAnnotationMark?,
     ): List<PatternSearcher.GroupOfResult<PatternHitType>> {
-        val shouldCountHits = false // mark != null
+        val shouldCountHits = mark != null
         val maxNumberOfUniqueHits: Int? = calculateMaxNbOfHits(shouldCountHits, text, mark)
         var numberOfUniqueHits = 0
         val resultDic = mutableMapOf<Any, PatternHitType>()
