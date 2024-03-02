@@ -23,7 +23,7 @@ internal open class KotlinMethodPattern(
         "\\((\\s*(?:\\w*\\s*:\\s*[\\w\\.]*(?:\\(.*\\)\\s*->\\s*[\\w\\.]*)?(?:\\s*=\\s*.*)?,?\\s*)*\\s*)\\)"
 
     // "\\(([^)]*)\\)"
-    open val returnType: String = "(?::\\s*\\w+)"
+    open val returnType: String = "(?::\\s*[\\w\\.<>]+)"
     open val insideIndentation: String = "\\s*"
 
     open fun getTraceAnnotation(): String {
