@@ -28,18 +28,21 @@ class TrackingPlugin : Plugin<Project> {
             tasks.register<ProcessTraceTask>(TraceProcessingParams.PROCESSING_TASK_NAME) {
                 listOfConfigs = trackingConfig.configurationHandler.configs
                 doLast {
-                    if(TrackingPlugin.DEBUG) println("PROCESSTRACE processing trace")
+                    if (TrackingPlugin.DEBUG) println("PROCESSTRACE processing trace")
                 }
             }
 
             tasks.register<UnprocessTraceTask>(TraceProcessingParams.REVERSE_PROCESSING_TASK_NAME) {
                 listOfConfigs = trackingConfig.configurationHandler.configs
                 doLast {
-                    if(TrackingPlugin.DEBUG) println("PROCESSTRACE Put trace annotation back to normal")
+                    if (TrackingPlugin.DEBUG) println("PROCESSTRACE Put trace annotation back to normal")
                 }
             }
 
             afterEvaluate {
+                tasks.getByName("preBuild") {
+                    dependsOn(TraceProcessingParams.PROCESSING_TASK_NAME)
+                }
                 trackingConfig.trackables.forEach { taskName ->
                     tasks.getByName(taskName).let {
                         tasks.register("${TraceProcessingParams.TRACABLE_TASKS_PREFIX}${it.name.capitalized()}") {
