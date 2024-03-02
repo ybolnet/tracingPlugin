@@ -1,5 +1,6 @@
 package com.ybo.trackingplugin.tasks
 
+import com.ybo.trackingplugin.TrackingPlugin
 import com.ybo.trackingplugin.extension.TraceConfig
 import com.ybo.trackingplugin.tasks.data.TraceAnnotationMark
 import com.ybo.trackingplugin.tasks.data.getLanguage
@@ -51,7 +52,7 @@ open class BrowsingTask : DefaultTask() {
                         config,
                     )
                 } else {
-                    println("we cannot read ${it.name}. moving on.")
+                    if (TrackingPlugin.DEBUG) println("we cannot read ${it.name}. moving on.")
                 }
             }
         }

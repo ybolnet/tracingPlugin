@@ -8,6 +8,7 @@ open class TrackingPluginExtension {
      * leave the code as they have found them.
      * */
     var trackables: Array<String> = emptyArray()
+    var debug: Boolean = false
 
     /** Configure the inner DSL object, [TraceProcessConfigHandler]. */
     val configurationHandler: TraceProcessConfigHandler = TraceProcessConfigHandler()

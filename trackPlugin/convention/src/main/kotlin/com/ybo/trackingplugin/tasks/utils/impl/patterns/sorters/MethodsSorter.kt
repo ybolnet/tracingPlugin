@@ -1,5 +1,6 @@
 package com.ybo.trackingplugin.tasks.utils.impl.patterns.sorters
 
+import com.ybo.trackingplugin.TrackingPlugin
 import com.ybo.trackingplugin.tasks.data.TracedMethod
 import com.ybo.trackingplugin.tasks.utils.ResultSorter
 
@@ -12,8 +13,8 @@ internal class MethodsSorter(private val text: String) : ResultSorter<TracedMeth
             .sortedBy {
                 it.line
             }.also {
-                println("SORTING before ${list.map { it.name }}")
-                println("SORTING after ${it.map { it.method.name + " l=" + it.line }}")
+                if (TrackingPlugin.DEBUG) println("SORTING before ${list.map { it.name }}")
+                if (TrackingPlugin.DEBUG) println("SORTING after ${it.map { it.method.name + " l=" + it.line }}")
             }.map {
                 it.method
             }
@@ -67,7 +68,7 @@ internal class MethodsSorter(private val text: String) : ResultSorter<TracedMeth
     }
 
     private fun calculateLine(text: String, needle: String, n: Int): Int {
-        println("CALCULATE: $needle  $n")
+        if (TrackingPlugin.DEBUG) println("CALCULATE: $needle  $n")
         val needleNb = countOccurrences(text, needle)
         return if (needleNb > 0 && needleNb >= n && n > 0) {
             val subtexts = text.split(needle)
@@ -77,7 +78,7 @@ internal class MethodsSorter(private val text: String) : ResultSorter<TracedMeth
                 nbLines += subText.filter { it == '\n' }.length
             }
             nbLines += (n - 1) * needle.filter { it == '\n' }.length
-            println("CALCULATE: returning $nbLines")
+            if (TrackingPlugin.DEBUG) println("CALCULATE: returning $nbLines")
             nbLines
         } else {
             -1

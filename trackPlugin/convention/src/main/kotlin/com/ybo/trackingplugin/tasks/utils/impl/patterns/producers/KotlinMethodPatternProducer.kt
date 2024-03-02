@@ -1,5 +1,6 @@
 package com.ybo.trackingplugin.tasks.utils.impl.patterns.producers
 
+import com.ybo.trackingplugin.TrackingPlugin
 import com.ybo.trackingplugin.tasks.data.PatternToSearch
 import com.ybo.trackingplugin.tasks.data.TraceAnnotationMark
 import com.ybo.trackingplugin.tasks.utils.PatternProducer
@@ -23,7 +24,7 @@ class KotlinMethodPatternProducer(
         )
             .orThrowIfIncoherent()
             .also {
-                println("produced : $it")
+                if (TrackingPlugin.DEBUG) println("produced : $it")
             }
     }
 

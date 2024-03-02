@@ -1,5 +1,6 @@
 package com.ybo.trackingplugin.tasks
 
+import com.ybo.trackingplugin.TrackingPlugin
 import com.ybo.trackingplugin.tasks.data.TraceAnnotationMark
 import com.ybo.trackingplugin.tasks.data.TracedMethod
 import com.ybo.trackingplugin.tasks.utils.TextExtractor
@@ -17,14 +18,12 @@ import java.io.File
  * counterpart of [UnprocessTraceTask]*/
 open class ProcessTraceTask : BrowsingTask() {
 
-
-
     @TaskAction
     fun processTrace() {
         alterationsMap = mutableMapOf<String, Int>()
         startTime = System.currentTimeMillis()
         browseCode { tracked, config ->
-            println("starting browsing took " + (System.currentTimeMillis() - startTime))
+            if (TrackingPlugin.DEBUG) println("starting browsing took " + (System.currentTimeMillis() - startTime))
             startTime = System.currentTimeMillis()
             if (config.srcPath == null) {
                 throw GradleException("srcPath must be defined")
@@ -46,7 +45,7 @@ open class ProcessTraceTask : BrowsingTask() {
     ): Int {
         val tag = TraceProcessingParams.TAG
         var text = file.readText()
-        println("reading file ${file.name} took " + (System.currentTimeMillis() - startTime))
+        if (TrackingPlugin.DEBUG) println("reading file ${file.name} took " + (System.currentTimeMillis() - startTime))
         startTime = System.currentTimeMillis()
         val codeGenerator = createCodeGenerator(mark.language)
         val methodExtractor = TextExtractor(
@@ -54,17 +53,17 @@ open class ProcessTraceTask : BrowsingTask() {
             patternSearcher = createPatternSearcherForTracedMethods(mark),
             resultSorter = MethodsSorter(text),
         )
-        println("creating stuff took " + (System.currentTimeMillis() - startTime))
+        if (TrackingPlugin.DEBUG) println("creating stuff took " + (System.currentTimeMillis() - startTime))
         startTime = System.currentTimeMillis()
         val tracedMethods = methodExtractor.extract(text, mark)
-        println("extracting took " + (System.currentTimeMillis() - startTime))
+        if (TrackingPlugin.DEBUG) println("extracting took " + (System.currentTimeMillis() - startTime))
         if (tracedMethods.isEmpty()) {
-            println("no traced methods")
+            if (TrackingPlugin.DEBUG) println("no traced methods")
             return 0
         }
         var indexOfTraceInFile = 0
         for (method in tracedMethods) {
-            println("processing method ${method.name} pattern ${method.patternType} ${mark.shortVersion} ")
+            if (TrackingPlugin.DEBUG) println("processing method ${method.name} pattern ${method.patternType} ${mark.shortVersion} ")
             try {
                 val paramsExtractor = TextExtractor(
                     patternProducer = createPatternProducerForTracedParams(
@@ -80,14 +79,14 @@ open class ProcessTraceTask : BrowsingTask() {
                 val paramsStr = paramsExtractor
                     .extract(method.paramBlock)
                     .joinToString(", ") { it.name }
-                println("extracting params " + (System.currentTimeMillis() - startTime))
+                if (TrackingPlugin.DEBUG) println("extracting params " + (System.currentTimeMillis() - startTime))
 
                 val newLine = (method.wholeSignature + "")
                     .replace(mark.shortVersion, processed.longVersion)
                     .replace(mark.longVersion, processed.longVersion)
 
                 val alto = getMethodAlterationOffset(method, file)
-                println("alterationOffset = $alto + $indexOfTraceInFile for file ${file.name} and method ${method.name}")
+                if (TrackingPlugin.DEBUG) println("alterationOffset = $alto + $indexOfTraceInFile for file ${file.name} and method ${method.name}")
                 val alterationOffsetForThisMethod =
                     getMethodAlterationOffset(method, file) + indexOfTraceInFile
                 text = text.replace(
@@ -106,11 +105,11 @@ open class ProcessTraceTask : BrowsingTask() {
                 setMethodAlterationOffset(method, file, alterationOffsetForThisMethod)
             } catch (error: GradleException) {
                 error.printStackTrace()
-                println("skipping method ${method.name}...")
+                if (TrackingPlugin.DEBUG) println("skipping method ${method.name}...")
             }
         }
         file.writeText(text)
-        println("processing trace done for file " + file.name)
+        if (TrackingPlugin.DEBUG) println("processing trace done for file " + file.name)
         return indexOfTraceInFile
     }
 

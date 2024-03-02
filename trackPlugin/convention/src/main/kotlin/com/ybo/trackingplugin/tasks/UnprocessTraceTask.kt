@@ -1,5 +1,6 @@
 package com.ybo.trackingplugin.tasks
 
+import com.ybo.trackingplugin.TrackingPlugin
 import com.ybo.trackingplugin.tasks.data.TraceAnnotationMark
 import org.gradle.api.tasks.TaskAction
 import java.io.File
@@ -34,7 +35,7 @@ open class UnprocessTraceTask : BrowsingTask() {
         if (!text.contains(processed.longVersion) && !text.contains(processed.shortVersion)) {
             return false
         }
-        println("unprocessing trace for file " + file.name)
+        if (TrackingPlugin.DEBUG) println("unprocessing trace for file " + file.name)
         matcher.forEach {
             text = text.replace(it.value, "")
         }
@@ -48,7 +49,7 @@ open class UnprocessTraceTask : BrowsingTask() {
                 .replace(processed.longVersion, toProcessAnnotationLong)
         }
         file.writeText(text)
-        println("unprocessing trace done for file " + file.name)
+        if (TrackingPlugin.DEBUG) println("unprocessing trace done for file " + file.name)
         return true
     }
 }

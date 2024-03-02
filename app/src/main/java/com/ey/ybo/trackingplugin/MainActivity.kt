@@ -59,7 +59,7 @@ fun testar(b: Int, c: Int, block: (a: Int) -> Unit) {
 }
 
 @DefTraceTest
-fun testarde(b: Int, c: Int, block: () -> Unit) {
+fun testarde(b: Int, c: Int, block: () -> Unit) :Bob<Ibo>{
     block.invoke()
 }
 

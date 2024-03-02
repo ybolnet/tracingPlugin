@@ -1,5 +1,6 @@
 package com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers
 
+import com.ybo.trackingplugin.TrackingPlugin
 import com.ybo.trackingplugin.tasks.data.PatternToSearch
 import com.ybo.trackingplugin.tasks.data.TraceAnnotationMark
 import com.ybo.trackingplugin.tasks.utils.PatternSearcher
@@ -22,19 +23,19 @@ internal open class BasePatternSearcher<out PatternHitType, in PatternType : Pat
         var numberOfUniqueHits = 0
         val resultDic = mutableMapOf<Any, PatternHitType>()
 
-        println("max hits $maxNumberOfUniqueHits")
+        if (TrackingPlugin.DEBUG) println("max hits $maxNumberOfUniqueHits")
         return patterns.mapNotNull { pattern ->
-            println("found hits $numberOfUniqueHits")
+            if (TrackingPlugin.DEBUG) println("found hits $numberOfUniqueHits")
             val matcher = pattern.regex().findAll(text)
             val abortForEfficiency =
                 shouldCountHits && (maxNumberOfUniqueHits!! <= numberOfUniqueHits)
             val startTime: Long = System.currentTimeMillis()
             if (abortForEfficiency || matcher.count() == 0) {
-                println("cost of regex ${pattern.name} : \n ${System.currentTimeMillis() - startTime}")
-                println("nothing for pattern ${pattern.name} (aborted? $abortForEfficiency)")
+                if (TrackingPlugin.DEBUG) println("cost of regex ${pattern.name} : \n ${System.currentTimeMillis() - startTime}")
+                if (TrackingPlugin.DEBUG) println("nothing for pattern ${pattern.name} (aborted? $abortForEfficiency)")
                 null
             } else {
-                println("cost of regex ${pattern.name}  : \n ${System.currentTimeMillis() - startTime}")
+                if (TrackingPlugin.DEBUG) println("cost of regex ${pattern.name}  : \n ${System.currentTimeMillis() - startTime}")
                 PatternSearcher.GroupOfResult(
                     patternName = pattern.name,
                     results = matcher
