@@ -15,6 +15,9 @@ import com.ey.ybo.trackingplugin.annotations.Trace
 import com.ey.ybo.trackingplugin.ui.theme.TrackingPluginTheme
 import com.ybo.trackingplugin.tracerlib.defaulttracer.DefTraceTest
 
+/**
+ok @DefTraceTest as test
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

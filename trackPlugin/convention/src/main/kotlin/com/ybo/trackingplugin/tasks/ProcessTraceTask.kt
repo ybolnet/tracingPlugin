@@ -22,6 +22,7 @@ open class ProcessTraceTask : BrowsingTask() {
     fun processTrace() {
         alterationsMap = mutableMapOf<String, Int>()
         startTime = System.currentTimeMillis()
+        val residuals = mutableListOf<Residual>()
         browseCode { tracked, config ->
             if (TrackingPlugin.DEBUG) println("starting browsing took " + (System.currentTimeMillis() - startTime))
             startTime = System.currentTimeMillis()
@@ -33,8 +34,22 @@ open class ProcessTraceTask : BrowsingTask() {
                 tracked.toBeProcessedMarkToTrack,
                 tracked.alreadyProcessedMarkToTrack,
                 config.tracerFactory,
-            )
+            ).also {
+                if (it.nbMarks != 0) {
+                    residuals.add(it)
+                }
+            }
         }
+        residuals
+            .fold("") { acc, residual ->
+                acc + residual.nbMarks +
+                    " remaining unprocessed marks in " + residual.filename + ",\n "
+            }
+            .let {
+                if (it.isNotBlank()) {
+                    println(" /!\\ final check problem : $it")
+                }
+            }
     }
 
     private fun processTraceAnnotations(
@@ -42,27 +57,14 @@ open class ProcessTraceTask : BrowsingTask() {
         mark: TraceAnnotationMark,
         processed: TraceAnnotationMark,
         tracerFactortStr: String,
-    ): Int {
+    ): Residual {
         val tag = TraceProcessingParams.TAG
         var text = file.readText()
         if (TrackingPlugin.DEBUG) println("reading file ${file.name} took " + (System.currentTimeMillis() - startTime))
         startTime = System.currentTimeMillis()
         val codeGenerator = createCodeGenerator(mark.language)
-        val methodExtractor = TextExtractor(
-            patternProducer = createPatternProducerForTracedMethods(mark),
-            patternSearcher = createPatternSearcherForTracedMethods(mark),
-            resultSorter = MethodsSorter(text),
-        )
-        if (TrackingPlugin.DEBUG) println("creating stuff took " + (System.currentTimeMillis() - startTime))
-        startTime = System.currentTimeMillis()
-        val tracedMethods = methodExtractor.extract(text, mark)
-        if (TrackingPlugin.DEBUG) println("extracting took " + (System.currentTimeMillis() - startTime))
-        if (tracedMethods.isEmpty()) {
-            if (TrackingPlugin.DEBUG) println("no traced methods")
-            return 0
-        }
         var indexOfTraceInFile = 0
-        for (method in tracedMethods) {
+        extractMethods(text, mark) { method ->
             if (TrackingPlugin.DEBUG) println("processing method ${method.name} pattern ${method.patternType} ${mark.shortVersion} ")
             try {
                 val paramsExtractor = TextExtractor(
@@ -110,18 +112,54 @@ open class ProcessTraceTask : BrowsingTask() {
         }
         file.writeText(text)
         if (TrackingPlugin.DEBUG) println("processing trace done for file " + file.name)
-        return indexOfTraceInFile
+        return Residual(file.name, nbOfResidualMarks(mark, text))
     }
 
-    fun setMethodAlterationOffset(method: TracedMethod, file: File, offset: Int) {
+    private fun extractMethods(
+        text: String,
+        mark: TraceAnnotationMark,
+        onMethod: (method: TracedMethod) -> Unit,
+    ) {
+        val methodExtractor = TextExtractor(
+            patternProducer = createPatternProducerForTracedMethods(mark),
+            patternSearcher = createPatternSearcherForTracedMethods(mark),
+            resultSorter = MethodsSorter(text),
+        )
+        val tracedMethods = methodExtractor.extract(text, mark)
+        if (TrackingPlugin.DEBUG) println("extracting took " + (System.currentTimeMillis() - startTime))
+        if (tracedMethods.isEmpty()) {
+            if (TrackingPlugin.DEBUG) println("no traced methods")
+            return
+        }
+
+        for (method in tracedMethods) {
+            if (TrackingPlugin.DEBUG) println("processing method ${method.name} pattern ${method.patternType} ${mark.shortVersion} ")
+            onMethod(method)
+        }
+    }
+
+    private fun setMethodAlterationOffset(method: TracedMethod, file: File, offset: Int) {
         val key = method.wholeSignature + file.name
         alterationsMap[key] = offset
     }
 
-    fun getMethodAlterationOffset(method: TracedMethod, file: File): Int {
+    private fun getMethodAlterationOffset(method: TracedMethod, file: File): Int {
         val key = method.wholeSignature + file.name
         return alterationsMap[key] ?: 0
     }
+
+    /** calculates number of [Residual]s when a file has been treated.*/
+    private fun nbOfResidualMarks(
+        mark: TraceAnnotationMark,
+        text: String,
+    ): Int {
+        val extendedFormNb = text.split(mark.longVersion, ignoreCase = true).size - 1
+        val contractedFormNb = text.split(mark.shortVersion, ignoreCase = true).size - 1
+        return extendedFormNb + contractedFormNb
+    }
+
+    /** represents a case of a annotation mark that was not recognized as a tracked method */
+    data class Residual(val filename: String, val nbMarks: Int)
 
     companion object {
         var alterationsMap = mutableMapOf<String, Int>()
