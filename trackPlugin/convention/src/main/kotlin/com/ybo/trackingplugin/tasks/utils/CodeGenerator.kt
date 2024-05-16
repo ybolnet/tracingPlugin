@@ -1,6 +1,7 @@
 package com.ybo.trackingplugin.tasks.utils
 
 import com.ybo.trackingplugin.tasks.TraceProcessingParams
+import com.ybo.trackingplugin.tasks.data.TraceAnnotationMark
 
 /**
  * generator of the code line that will be added at the start of tracked methods
@@ -16,5 +17,6 @@ abstract class CodeGenerator {
         methodName: String,
         tag: String,
         alterationOffset: Int,
+        mark: TraceAnnotationMark,
     ): String
 }

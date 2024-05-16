@@ -8,6 +8,7 @@ object TracePerformer {
         tracerFactory: Tracer.Factory,
         method: String,
         java: Boolean,
+        annotationName: String,
         paramz: Array<Any?>,
         alterationOffset: Int,
     ) {
@@ -20,7 +21,7 @@ object TracePerformer {
                 null
             }
         }
-        val methodNameToTheBestOfKnowledge = if(method.isNotBlank()) {
+        val methodNameToTheBestOfKnowledge = if (method.isNotBlank()) {
             method.decodedFromB64()
         } else {
             stackElement?.methodName ?: ""
@@ -48,6 +49,7 @@ object TracePerformer {
         val invalidateHistory = tracer.trace(
             defaultMessage = makeMessage(java, fullMethodName, paramz),
             java = java,
+            annotationName = annotationName.decodedFromB64(),
             method = currentMethod,
             history = historyOfMethods,
             parameterValues = paramz,

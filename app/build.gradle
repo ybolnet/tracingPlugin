@@ -6,11 +6,15 @@ plugins {
 
 
 tracing {
-    trackables = ["installDevelopDebug","assembleDevelop"]
-    config{
+    trackables = ["installDevelopDebug", "assembleDevelop"]
+    config {
         def annotationPackage = "com.ey.ybo.trackingplugin.annotations"
-        addDefaultConfig { conf->
+        addDefaultConfig { conf ->
             conf.srcPath = "../app/src/main"
+        }
+        addReturnValueConfig { conf ->
+            conf.srcPath = "../app/src/main"
+            conf.tracerFactory = "${annotationPackage}.ReturnTracerFactory"
         }
         /*add{conf->
             conf.name = "Trace"

@@ -11,6 +11,7 @@ interface Tracer {
     fun trace(
         defaultMessage: String,
         java: Boolean,
+        annotationName: String,
         method: Method,
         history: List<Method>,
         parameterValues: Array<Any?>,

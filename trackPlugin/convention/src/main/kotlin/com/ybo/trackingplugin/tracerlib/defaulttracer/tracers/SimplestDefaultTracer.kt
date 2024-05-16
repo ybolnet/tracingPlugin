@@ -6,6 +6,7 @@ class SimplestDefaultTracer : Tracer {
     override fun trace(
         defaultMessage: String,
         java: Boolean,
+        annotationName: String,
         method: Tracer.Method,
         history: List<Tracer.Method>,
         parameterValues: Array<Any?>,

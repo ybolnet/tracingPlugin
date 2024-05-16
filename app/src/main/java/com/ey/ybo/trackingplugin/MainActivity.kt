@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.ey.ybo.trackingplugin.annotations.Bullshit
 import com.ey.ybo.trackingplugin.annotations.Trace
+import com.ey.ybo.trackingplugin.annotations.withTrace
 import com.ey.ybo.trackingplugin.ui.theme.TrackingPluginTheme
 import com.ybo.trackingplugin.tracerlib.defaulttracer.DefTraceTest
 
@@ -48,7 +49,7 @@ class MainActivity : ComponentActivity() {
 fun test(p1: Int, p2: Double, p3: Int = 4): Int {
     android.util.Log.d("TESTO", "TESTIL")
     val b: Int = p1
-    return (p1 + 1)
+    return (p1 + 1).withTrace()
 }
 
 @DefTraceTest

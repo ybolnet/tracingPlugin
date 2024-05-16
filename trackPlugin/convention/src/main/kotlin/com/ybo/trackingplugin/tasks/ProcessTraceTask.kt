@@ -100,6 +100,7 @@ open class ProcessTraceTask : BrowsingTask() {
                         methodName = method.name,
                         tag = tag,
                         alterationOffset = alterationOffsetForThisMethod,
+                        mark = mark
                     ),
                 )
 
