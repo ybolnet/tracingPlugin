@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @DefTraceTest
-fun test(p1: Int, p2: Double, p3: Int = 4): Int {
+fun test(p1: Int, p2: Double, p3: Int = 4): Int? {
     android.util.Log.d("TESTO", "TESTIL")
     val b: Int = p1
     return (p1 + 1).withTrace()
@@ -58,7 +58,7 @@ fun test2() {
 }
 
 @DefTraceTest
-fun testar(b: Int, c: Int, block: (a: Int) -> Unit) {
+fun testar(b: Int?, c: Int, block: (a: Int) -> Unit) {
     block.invoke(1)
 }
 
