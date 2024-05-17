@@ -17,13 +17,13 @@ internal open class KotlinMethodPattern(
     open val preFunKeywords: String =
         "(?:override\\s+|inline\\s+|private\\s+|public\\s+|protected\\s+|suspend\\s+)"
     open val funKeyword: String = "fun"
-    open val generics: String = "(?:\\s*<\\s*\\w*\\s*>\\s*)"
+    open val generics: String = "(?:\\s*<\\s*$VAR_NAME\\s*$RETURNED_TYPE?>\\s*)"
     open val methodName: String = "\\w+"
     open val paramsWithCapture: String =
-        "\\((\\s*(?:\\w*\\s*:\\s*[\\w\\.]*(?:\\(.*\\)\\s*->\\s*[\\w\\.]*)?(?:\\s*=\\s*.*)?,?\\s*)*\\s*)\\)"
+        "\\((\\s*(?:\\w*\\s*:\\s*[\\w\\.\\?]*(?:\\(.*\\)\\s*->\\s*[\\w\\.]*)?(?:\\s*=\\s*.*)?,?\\s*)*\\s*)\\)"
 
     // "\\(([^)]*)\\)"
-    open val returnType: String = "(?::\\s*[\\w\\.<>]+)"
+    open val returnType: String = "(?::\\s*$ANY_TYPE)"
     open val insideIndentation: String = "\\s*"
 
     open fun getTraceAnnotation(): String {
@@ -48,5 +48,11 @@ internal open class KotlinMethodPattern(
 
     override fun toString(): String {
         return "{name $name, regex: " + regex() + "}"
+    }
+
+    companion object {
+        const val ANY_TYPE = "[\\w\\.<>\\? ]+"
+        const val VAR_NAME = "\\w*"
+        const val RETURNED_TYPE = "(?:\\s*:\\s*$ANY_TYPE)"
     }
 }
