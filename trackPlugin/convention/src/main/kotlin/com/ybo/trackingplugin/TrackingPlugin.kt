@@ -21,14 +21,14 @@ class TrackingPlugin : Plugin<Project> {
             DEBUG = trackingConfig.debug
 
             with(pluginManager) {
-                apply("com.android.application")
+                // apply("com.android.application")
                 apply("org.jetbrains.kotlin.android")
             }
 
             tasks.register<ProcessTraceTask>(TraceProcessingParams.PROCESSING_TASK_NAME) {
                 listOfConfigs = trackingConfig.configurationHandler.configs
                 doLast {
-                    if (TrackingPlugin.DEBUG) println("PROCESSTRACE processing trace")
+                    if (TrackingPlugin.DEBUG) println("PROCESSTRACE processing trace ")
                 }
             }
 
