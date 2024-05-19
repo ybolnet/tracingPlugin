@@ -21,7 +21,6 @@ class TrackingPlugin : Plugin<Project> {
             DEBUG = trackingConfig.debug
 
             with(pluginManager) {
-                // apply("com.android.application")
                 apply("org.jetbrains.kotlin.android")
             }
 
@@ -40,22 +39,26 @@ class TrackingPlugin : Plugin<Project> {
             }
 
             afterEvaluate {
-                tasks.getByName("preBuild") {
-                    dependsOn(TraceProcessingParams.PROCESSING_TASK_NAME)
-                }
+                // SANDWICHING: creating a task (handler task)
+                // so that when called, a target task (tracked task) will be preceded and followed
+                // respectively by preprocessing of trace, and unprocessing of trace
                 trackingConfig.trackables.forEach { taskName ->
-                    tasks.getByName(taskName).let {
-                        tasks.register("${TraceProcessingParams.TRACABLE_TASKS_PREFIX}${it.name.capitalized()}") {
+                    tasks.getByName(taskName).let { trackedTask ->
+                        val handlerTaskName =
+                            "${TraceProcessingParams.TRACABLE_TASKS_PREFIX}${trackedTask.name.capitalized()}"
+                        tasks.register(handlerTaskName) {
                             group = TraceProcessingParams.TASK_PROCESSING_GROUP
-                            // Hook prepareBuild to execute before the assemble task
+                            // so that the preprocessing precedes the tracked task
                             dependsOn(TraceProcessingParams.PROCESSING_TASK_NAME)
 
-                            // Hook trackable to execute after prepareBuild
-                            dependsOn(it.name)
+                            // So that the handler task trigger the tracked task
+                            finalizedBy(trackedTask.name)
 
-                            // Hook postpareBuild to execute after the trackable task
+                            // So that the unprocessing follows the tracked task
                             finalizedBy(TraceProcessingParams.REVERSE_PROCESSING_TASK_NAME)
-                            it.finalizedBy(TraceProcessingParams.REVERSE_PROCESSING_TASK_NAME)
+                            tasks.getByName(TraceProcessingParams.REVERSE_PROCESSING_TASK_NAME)
+                                .mustRunAfter(trackedTask.name)
+                            // order is: preprocessing -> handler task -> tracked task -> unprocessing
                         }
                     }
                 }

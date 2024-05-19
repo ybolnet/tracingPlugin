@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
             val v = 1
         }
 
-        testarde(1, 2) @Bullshit @DefTraceTest @Trace {
+        testardinho(1, 2) @Bullshit @DefTraceTest @Trace {
             val v = 1
         }
         setContent {
@@ -63,7 +63,7 @@ fun testar(b: Int?, c: Int, block: (a: Int) -> Unit) {
 }
 
 @DefTraceTest
-fun testarde(b: Int, c: Int, block: () -> Unit) {
+fun testardinho(b: Int, c: Int, block: () -> Unit) {
     block.invoke()
 }
 
