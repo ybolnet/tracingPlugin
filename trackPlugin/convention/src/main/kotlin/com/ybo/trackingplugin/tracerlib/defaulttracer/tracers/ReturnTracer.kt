@@ -1,6 +1,7 @@
 package com.ybo.trackingplugin.tracerlib.defaulttracer.tracers
 
 import com.ybo.trackingplugin.tracerlib.Tracer
+import com.ybo.trackingplugin.tracerlib.defaulttracer.ReturnTrace
 
 /**
  * tracer specialized for the return value of methods.
@@ -43,6 +44,38 @@ abstract class ReturnValueTracer : Tracer {
     }
 }
 
-interface Returner {
-    fun <T> traceReturning(toTrace: T, callingMethod: String): T
+/**
+ * part of the process to trace return value.
+ * Implement this
+ */
+abstract class Returner {
+
+    fun <T> trace(returnValue: T): T {
+        val stackElement = Throwable().stackTrace.run {
+            if (size >= 3) {
+                this[2]
+            } else {
+                null
+            }
+        }
+        val fullMethodName =
+            (stackElement?.className ?: "") + "." + (stackElement?.methodName ?: "")
+        return onAnnotateThisToTrace(returnValue, fullMethodName)
+    }
+
+    abstract fun <T> onAnnotateThisToTrace(toTrace: T, callingMethod: String): T
 }
+/*
+
+fun <T> Any?.withTrace(): T {
+    return ExampleReturner().trace(this as T)
+}
+
+class ExampleReturner() : Returner() {
+    @ReturnTrace
+    override fun <T> onAnnotateThisToTrace(toTrace: T, callingMethod: String): T {
+        return toTrace
+    }
+}
+
+ */

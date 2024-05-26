@@ -6,25 +6,15 @@ import com.ybo.trackingplugin.tracerlib.defaulttracer.tracers.ReturnValueTracer
 import com.ybo.trackingplugin.tracerlib.defaulttracer.tracers.Returner
 
 annotation class Trace()
-annotation class UnTrace()
 annotation class Bullshit()
 
-fun <T> Any.withTrace(): T {
-    val throwable = Throwable()
-    val stackElement = throwable.stackTrace.run {
-        if (size >= 2) {
-            this[1]
-        } else {
-            null
-        }
-    }
-    val fullMethodName = (stackElement?.className ?: "") + "." + (stackElement?.methodName ?: "")
-    return ReturnerImpl().traceReturning(this as T, fullMethodName)
+fun <T> Any?.withTrace(): T {
+    return ExampleReturner().trace(this as T)
 }
 
-class ReturnerImpl : Returner {
+class ExampleReturner() : Returner() {
     @ReturnTrace
-    override fun <T> traceReturning(toTrace: T, callingMethod: String): T {
+    override fun <T> onAnnotateThisToTrace(toTrace: T, callingMethod: String): T {
         return toTrace
     }
 }

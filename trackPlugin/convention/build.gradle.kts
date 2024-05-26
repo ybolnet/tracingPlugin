@@ -6,7 +6,7 @@ plugins {
 }
 val ourGroupId = "io.github.ybolnet"
 val ourArtifactId = "traceplugin"
-val ourVersionArtifact = "0.3.2"
+val ourVersionArtifact = "0.3.4"
 val ourPluginName = "TracePlugin"
 val pluginId = ourGroupId
 val pluginMainClass = "com.ybo.trackingplugin.TrackingPlugin"
