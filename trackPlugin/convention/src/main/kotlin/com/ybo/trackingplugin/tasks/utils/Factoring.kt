@@ -20,6 +20,7 @@ import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.Kotl
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.KotlinAndJavaParamResolver
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.KotlinMethodHigherOrderNoParamsResolver
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.KotlinMethodHigherOrderResolver
+import com.ybo.trackingplugin.toB64
 import org.gradle.api.GradleException
 
 fun createCodeGenerator(language: TracedLanguage): CodeGenerator {
@@ -73,7 +74,7 @@ fun createPatternProducerForTracedParams(
     }
 }
 
-fun createPatternSearcherForTracedParams(
+internal fun createPatternSearcherForTracedParams(
     language: TracedLanguage,
     methodPatternType: MethodPatternNames,
 ): PatternSearcher<TracedMethodParam, ParamsPatternName> {
@@ -83,4 +84,8 @@ fun createPatternSearcherForTracedParams(
 
         TracedLanguage.OTHER -> throw GradleException("unknown language")
     }
+}
+
+internal fun createReverseTraceAnnotationConfig(traceAnnotationConfig: String): String {
+    return "com.ybo.trackingplugin.tracerlib.defaulttracer.ReverseTrace(target =\"${traceAnnotationConfig.toB64()}\")"
 }

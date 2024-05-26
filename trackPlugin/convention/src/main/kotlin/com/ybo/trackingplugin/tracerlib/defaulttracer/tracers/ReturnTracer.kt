@@ -2,6 +2,14 @@ package com.ybo.trackingplugin.tracerlib.defaulttracer.tracers
 
 import com.ybo.trackingplugin.tracerlib.Tracer
 
+/**
+ * tracer specialized for the return value of methods.
+ * in the config{} closure of the plugin, use
+ *
+ *          addReturnValueConfig {
+ *             tracerFactory = "HERE PUT FACTORY CREATING A SUBTYPE OF ReturnValueTracer"
+ *         }
+ */
 abstract class ReturnValueTracer : Tracer {
 
     abstract fun traceReturn(
@@ -38,5 +46,3 @@ abstract class ReturnValueTracer : Tracer {
 interface Returner {
     fun <T> traceReturning(toTrace: T, callingMethod: String): T
 }
-
-

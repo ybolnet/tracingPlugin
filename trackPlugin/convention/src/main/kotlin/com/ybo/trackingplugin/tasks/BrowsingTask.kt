@@ -40,9 +40,9 @@ open class BrowsingTask : DefaultTask() {
             fileTree.forEach {
                 if (it.canRead()) {
                     val processedMarkToTrack =
-                        TraceAnnotationMark(config.alreadyProcessedAnnotation, it.getLanguage())
+                        TraceAnnotationMark(config.alreadyProcessedAnnotation(), it.getLanguage())
                     val toBeProcessedMarkToTrack =
-                        TraceAnnotationMark(config.toBeProcessedAnnotation, it.getLanguage())
+                        TraceAnnotationMark(config.annotation, it.getLanguage())
                     block(
                         TrackedFile(
                             file = it,
