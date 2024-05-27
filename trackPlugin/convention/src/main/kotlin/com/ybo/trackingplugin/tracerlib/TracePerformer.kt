@@ -46,20 +46,33 @@ object TracePerformer {
             link = stringLink,
         )
         historyOfMethods.add(currentMethod)
-        val invalidateHistory = tracer.trace(
+        tracer.trace(
             defaultMessage = makeMessage(java, fullMethodName, paramz),
             java = java,
             annotationName = annotationName.decodedFromB64(),
             method = currentMethod,
             history = historyOfMethods,
             parameterValues = paramz,
-        )
-        if (invalidateHistory) {
-            historyOfMethods.clear()
+        ).also {
+            when (it) {
+                Tracer.TraceHistoryManagementAction.Clear -> historyOfMethods.clear()
+                Tracer.TraceHistoryManagementAction.DeleteOldest -> {
+                    if (historyOfMethods.size >= 1) {
+                        historyOfMethods[0] = null
+                    }
+                }
+
+                Tracer.TraceHistoryManagementAction.None -> {}
+                is Tracer.TraceHistoryManagementAction.NullAtIndex -> {
+                    if (it.index < historyOfMethods.size) {
+                        historyOfMethods[it.index] = null
+                    }
+                }
+            }
         }
     }
 
-    fun makeMessage(
+    private fun makeMessage(
         java: Boolean,
         methodName: String,
         parameterValues: Array<Any?>,
@@ -73,5 +86,5 @@ object TracePerformer {
         return " $methodName($params) "
     }
 
-    private val historyOfMethods: MutableList<Tracer.Method> = mutableListOf()
+    private val historyOfMethods: MutableList<Tracer.Method?> = mutableListOf()
 }

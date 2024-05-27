@@ -1,6 +1,8 @@
 package com.ybo.trackingplugin.tracerlib.defaulttracer.tracers
 
 import com.ybo.trackingplugin.tracerlib.Tracer
+import com.ybo.trackingplugin.tracerlib.Tracer.TraceHistoryManagementAction
+import com.ybo.trackingplugin.tracerlib.Tracer.TraceHistoryManagementAction.None
 
 class SimplestDefaultTracer : Tracer {
     override fun trace(
@@ -8,10 +10,10 @@ class SimplestDefaultTracer : Tracer {
         java: Boolean,
         annotationName: String,
         method: Tracer.Method,
-        history: List<Tracer.Method>,
+        history: List<Tracer.Method?>,
         parameterValues: Array<Any?>,
-    ): Boolean {
+    ): TraceHistoryManagementAction {
         println("$defaultMessage method $method")
-        return false
+        return None
     }
 }

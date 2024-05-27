@@ -1,7 +1,7 @@
 package com.ybo.trackingplugin.tracerlib.defaulttracer.tracers
 
 import com.ybo.trackingplugin.tracerlib.Tracer
-import com.ybo.trackingplugin.tracerlib.defaulttracer.ReturnTrace
+import com.ybo.trackingplugin.tracerlib.Tracer.TraceHistoryManagementAction
 
 /**
  * tracer specialized for the return value of methods.
@@ -13,22 +13,26 @@ import com.ybo.trackingplugin.tracerlib.defaulttracer.ReturnTrace
  */
 abstract class ReturnValueTracer : Tracer {
 
+    /**
+     * override this to be warned of a method returning,
+     * giving you the opportunity to trace it
+     */
     abstract fun traceReturn(
         defaultMessage: String,
         annotationName: String,
         methodReturning: String?,
-        history: List<Tracer.Method>,
+        history: List<Tracer.Method?>,
         returnedObject: Any?,
-    ): Boolean
+    ): TraceHistoryManagementAction
 
     override fun trace(
         defaultMessage: String,
         java: Boolean,
         annotationName: String,
         method: Tracer.Method,
-        history: List<Tracer.Method>,
+        history: List<Tracer.Method?>,
         parameterValues: Array<Any?>,
-    ): Boolean {
+    ): TraceHistoryManagementAction {
         if (parameterValues.size != 2) {
             throw Error("tracking error")
         }
@@ -39,8 +43,8 @@ abstract class ReturnValueTracer : Tracer {
         return traceReturn(defaultMessage, annotationName, callingMethod, history, returnedObject)
     }
 
-    fun List<Tracer.Method>.getMethodFromHistory(methodObf: String): Tracer.Method? {
-        return this.find { it.possiblyObfuscatedMethod == methodObf }
+    private fun List<Tracer.Method?>.getMethodFromHistory(methodObf: String): Tracer.Method? {
+        return this.find { it?.possiblyObfuscatedMethod == methodObf }
     }
 }
 

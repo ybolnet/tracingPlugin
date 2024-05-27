@@ -1,6 +1,7 @@
 package com.ey.ybo.trackingplugin.annotations
 
 import com.ybo.trackingplugin.tracerlib.Tracer
+import com.ybo.trackingplugin.tracerlib.Tracer.TraceHistoryManagementAction.None
 import com.ybo.trackingplugin.tracerlib.defaulttracer.ReturnTrace
 import com.ybo.trackingplugin.tracerlib.defaulttracer.tracers.ReturnValueTracer
 import com.ybo.trackingplugin.tracerlib.defaulttracer.tracers.Returner
@@ -28,10 +29,10 @@ class ReturnTracer : ReturnValueTracer() {
         defaultMessage: String,
         annotationName: String,
         methodReturning: String?,
-        history: List<Tracer.Method>,
+        history: List<Tracer.Method?>,
         returnedObject: Any?,
-    ): Boolean {
+    ): Tracer.TraceHistoryManagementAction {
         println("returning from $methodReturning $returnedObject")
-        return false
+        return None
     }
 }
