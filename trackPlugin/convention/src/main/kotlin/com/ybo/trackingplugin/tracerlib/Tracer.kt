@@ -13,11 +13,14 @@ interface Tracer {
     fun trace(
         defaultMessage: String,
         java: Boolean,
-        annotationName: String,
+        annotationName: TraceAnnotationName,
         method: Method,
         history: List<Method?>,
         parameterValues: Array<Any?>,
     ): TraceHistoryManagementAction
+
+    @JvmInline
+    value class TraceAnnotationName(val value: String)
 
     /**
      * what to do with history after a trace() call.
@@ -65,6 +68,20 @@ interface Tracer {
             this
         } else {
             TraceHistoryManagementAction.None
+        }
+    }
+
+    /**
+     * only the name of the annotation without the package path
+     */
+    fun TraceAnnotationName.shortName(): String {
+        return value.run {
+            val lastDotIndex = lastIndexOf('.')
+            if (lastDotIndex == -1) {
+                this // If no dot found, return the original string
+            } else {
+                substring(lastDotIndex + 1)
+            }
         }
     }
 

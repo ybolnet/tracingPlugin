@@ -49,7 +49,7 @@ object TracePerformer {
         tracer.trace(
             defaultMessage = makeMessage(java, fullMethodName, paramz),
             java = java,
-            annotationName = annotationName.decodedFromB64(),
+            annotationName = Tracer.TraceAnnotationName(annotationName.decodedFromB64()),
             method = currentMethod,
             history = historyOfMethods,
             parameterValues = paramz,

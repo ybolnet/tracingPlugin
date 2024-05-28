@@ -1,5 +1,6 @@
 package com.ybo.trackingplugin.tracerlib.defaulttracer.tracers
 
+import com.ybo.trackingplugin.tasks.data.TracedMethod
 import com.ybo.trackingplugin.tracerlib.Tracer
 import com.ybo.trackingplugin.tracerlib.Tracer.TraceHistoryManagementAction
 
@@ -19,8 +20,8 @@ abstract class ReturnValueTracer : Tracer {
      */
     abstract fun traceReturn(
         defaultMessage: String,
-        annotationName: String,
-        methodReturning: String?,
+        annotationName: Tracer.TraceAnnotationName,
+        methodReturning: ReturningContext,
         history: List<Tracer.Method?>,
         returnedObject: Any?,
     ): TraceHistoryManagementAction
@@ -28,7 +29,7 @@ abstract class ReturnValueTracer : Tracer {
     override fun trace(
         defaultMessage: String,
         java: Boolean,
-        annotationName: String,
+        annotationName: Tracer.TraceAnnotationName,
         method: Tracer.Method,
         history: List<Tracer.Method?>,
         parameterValues: Array<Any?>,
@@ -37,10 +38,26 @@ abstract class ReturnValueTracer : Tracer {
             throw Error("tracking error")
         }
         val returnedObject = parameterValues[0]
-        val callingMethod =
-            history.getMethodFromHistory(parameterValues[1] as String)?.originalName
-                ?: parameterValues[1] as String
-        return traceReturn(defaultMessage, annotationName, callingMethod, history, returnedObject)
+        val contextOfReturn = history.getMethodFromHistory(parameterValues[1] as String)?.let {
+            ReturningContext.CompleteMethod(it)
+        } ?: ReturningContext.MethodName(parameterValues[1] as String)
+        return traceReturn(defaultMessage, annotationName, contextOfReturn, history, returnedObject)
+    }
+
+    /**
+     * represents the code region (a method) returning the value.
+     * is the history is handled well, it is a [CompleteMethod].
+     * But if in the previous [Tracer.trace] calls you returned a value to manipulate
+     * the trace history, the method might have disappeared from history,
+     * and in this case, only the (possibly obfuscated) name of the returning function has
+     * survived. In this case we are dealing with a [MethodName]
+     */
+    sealed interface ReturningContext {
+        @JvmInline
+        value class CompleteMethod(val value: Tracer.Method) : ReturningContext
+
+        @JvmInline
+        value class MethodName(val value: String) : ReturningContext
     }
 
     private fun List<Tracer.Method?>.getMethodFromHistory(methodObf: String): Tracer.Method? {

@@ -27,8 +27,8 @@ class ReturnTracerFactory : Tracer.Factory {
 class ReturnTracer : ReturnValueTracer() {
     override fun traceReturn(
         defaultMessage: String,
-        annotationName: String,
-        methodReturning: String?,
+        annotationName: Tracer.TraceAnnotationName,
+        methodReturning: ReturningContext,
         history: List<Tracer.Method?>,
         returnedObject: Any?,
     ): Tracer.TraceHistoryManagementAction {
