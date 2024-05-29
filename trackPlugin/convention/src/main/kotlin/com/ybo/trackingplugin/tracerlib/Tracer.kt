@@ -13,7 +13,6 @@ interface Tracer {
     fun trace(
         defaultMessage: String,
         java: Boolean,
-        annotationName: TraceAnnotationName,
         method: Method,
         history: List<Method?>,
         parameterValues: Array<Any?>,
@@ -89,6 +88,7 @@ interface Tracer {
         val originalName: String,
         val possiblyObfuscatedMethod: String,
         val link: String = "",
+        val annotation: TraceAnnotationName
     )
 
     /** factory for Tracers. */

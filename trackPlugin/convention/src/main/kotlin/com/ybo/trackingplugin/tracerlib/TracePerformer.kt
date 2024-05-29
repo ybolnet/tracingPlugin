@@ -40,16 +40,19 @@ object TracePerformer {
             "$it:$line"
         } ?: ""
 
+        val annotation = Tracer.TraceAnnotationName(annotationName.decodedFromB64())
+
         val currentMethod = Tracer.Method(
             originalName = fullMethodName,
             possiblyObfuscatedMethod = fullMethodNamePossiblyObfuscated,
             link = stringLink,
+            annotation = annotation,
         )
+
         historyOfMethods.add(currentMethod)
         tracer.trace(
             defaultMessage = makeMessage(java, fullMethodName, paramz),
             java = java,
-            annotationName = Tracer.TraceAnnotationName(annotationName.decodedFromB64()),
             method = currentMethod,
             history = historyOfMethods,
             parameterValues = paramz,

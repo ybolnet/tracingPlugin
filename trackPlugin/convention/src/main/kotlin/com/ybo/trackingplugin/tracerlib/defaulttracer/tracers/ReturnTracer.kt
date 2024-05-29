@@ -1,6 +1,5 @@
 package com.ybo.trackingplugin.tracerlib.defaulttracer.tracers
 
-import com.ybo.trackingplugin.tasks.data.TracedMethod
 import com.ybo.trackingplugin.tracerlib.Tracer
 import com.ybo.trackingplugin.tracerlib.Tracer.TraceHistoryManagementAction
 
@@ -20,7 +19,6 @@ abstract class ReturnValueTracer : Tracer {
      */
     abstract fun traceReturn(
         defaultMessage: String,
-        annotationName: Tracer.TraceAnnotationName,
         methodReturning: ReturningContext,
         history: List<Tracer.Method?>,
         returnedObject: Any?,
@@ -29,7 +27,6 @@ abstract class ReturnValueTracer : Tracer {
     override fun trace(
         defaultMessage: String,
         java: Boolean,
-        annotationName: Tracer.TraceAnnotationName,
         method: Tracer.Method,
         history: List<Tracer.Method?>,
         parameterValues: Array<Any?>,
@@ -41,7 +38,7 @@ abstract class ReturnValueTracer : Tracer {
         val contextOfReturn = history.getMethodFromHistory(parameterValues[1] as String)?.let {
             ReturningContext.CompleteMethod(it)
         } ?: ReturningContext.MethodName(parameterValues[1] as String)
-        return traceReturn(defaultMessage, annotationName, contextOfReturn, history, returnedObject)
+        return traceReturn(defaultMessage, contextOfReturn, history, returnedObject)
     }
 
     /**
