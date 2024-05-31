@@ -11,7 +11,7 @@ class _CodeGeneratorKotlin : CodeGenerator() {
         insideMethodIndentation: String,
         methodName: String,
         tag: String,
-        alterationOffset: Int,
+        line: Int,
         mark: TraceAnnotationMark,
     ): String {
         return "/*$tag*/ $tracePerformerPackage.trace(" +
@@ -20,7 +20,7 @@ class _CodeGeneratorKotlin : CodeGenerator() {
             "false, " +
             "\"" + mark.longVersion.toB64() + "\"," +
             params.paramsOrNot() + "," +
-            alterationOffset + ")\n" +
+            line + ")\n" +
             insideMethodIndentation
     }
 

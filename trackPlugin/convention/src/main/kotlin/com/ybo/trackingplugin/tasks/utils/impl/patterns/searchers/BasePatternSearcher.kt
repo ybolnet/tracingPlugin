@@ -23,9 +23,9 @@ internal open class BasePatternSearcher<out PatternHitType, in PatternType : Pat
         var numberOfUniqueHits = 0
         val resultDic = mutableMapOf<Any, PatternHitType>()
 
-        if (TrackingPlugin.DEBUG) println("max hits $maxNumberOfUniqueHits")
+        if (TrackingPlugin.DEBUG) println("max hits for ${mark?.shortVersion}: $maxNumberOfUniqueHits")
         return patterns.mapNotNull { pattern ->
-            if (TrackingPlugin.DEBUG) println("found hits $numberOfUniqueHits")
+            if (TrackingPlugin.DEBUG) println("checking pattern ${pattern.name}")
             val matcher = pattern.regex().findAll(text)
             val abortForEfficiency =
                 shouldCountHits && (maxNumberOfUniqueHits!! <= numberOfUniqueHits)
@@ -52,6 +52,8 @@ internal open class BasePatternSearcher<out PatternHitType, in PatternType : Pat
                                 }
                         }.toList(),
                 )
+            }.also {
+                if (TrackingPlugin.DEBUG) println("found hits $numberOfUniqueHits for now")
             }
         }
     }

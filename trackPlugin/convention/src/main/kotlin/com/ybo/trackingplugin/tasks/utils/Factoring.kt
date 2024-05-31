@@ -1,5 +1,6 @@
 package com.ybo.trackingplugin.tasks.utils
 
+import com.ybo.trackingplugin.tasks.ProcessTraceTask
 import com.ybo.trackingplugin.tasks.data.TraceAnnotationMark
 import com.ybo.trackingplugin.tasks.data.TracedLanguage
 import com.ybo.trackingplugin.tasks.data.TracedMethod
@@ -20,6 +21,7 @@ import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.Kotl
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.KotlinAndJavaParamResolver
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.KotlinMethodHigherOrderNoParamsResolver
 import com.ybo.trackingplugin.tasks.utils.impl.patterns.searchers.resolvers.KotlinMethodHigherOrderResolver
+import com.ybo.trackingplugin.tasks.utils.impl.patterns.sorters.MethodsSorter
 import com.ybo.trackingplugin.toB64
 import org.gradle.api.GradleException
 
@@ -73,6 +75,14 @@ fun createPatternProducerForTracedParams(
         TracedLanguage.OTHER -> throw GradleException("unknown language")
     }
 }
+
+internal fun createSignalProcessor(): ProcessTraceTask.SignalProcessor = SignalProcessorImpl(
+    createPatternProducerForMethods = ::createPatternProducerForTracedMethods,
+    createPatternSearcherForMethods = ::createPatternSearcherForTracedMethods,
+    createMethodSorter = { text -> MethodsSorter(text) },
+    createPatternProducerForParams = ::createPatternProducerForTracedParams,
+    createPatternSearcherForParams = ::createPatternSearcherForTracedParams,
+)
 
 internal fun createPatternSearcherForTracedParams(
     language: TracedLanguage,

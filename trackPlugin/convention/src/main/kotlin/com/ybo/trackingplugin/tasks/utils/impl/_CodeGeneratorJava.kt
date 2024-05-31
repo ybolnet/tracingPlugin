@@ -11,7 +11,7 @@ class _CodeGeneratorJava : CodeGenerator() {
         insideMethodIndentation: String,
         methodName: String,
         tag: String,
-        alterationOffset: Int,
+        line: Int,
         mark: TraceAnnotationMark,
     ): String {
         return "/*$tag*/ $tracePerformerPackage.INSTANCE.trace(" +
@@ -20,7 +20,7 @@ class _CodeGeneratorJava : CodeGenerator() {
             "true, " +
             "\"" + mark.longVersion.toB64() + "\"," +
             "new Object[]{" + params + "}, " +
-            alterationOffset +
+            line +
             ");\n" +
             insideMethodIndentation
     }

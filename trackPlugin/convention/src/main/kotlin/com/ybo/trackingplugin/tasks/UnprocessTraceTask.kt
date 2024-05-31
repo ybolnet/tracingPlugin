@@ -12,12 +12,14 @@ open class UnprocessTraceTask : BrowsingTask() {
 
     @TaskAction
     fun unprocessTrace() {
-        browseCode { tracked, _ ->
-            unprocessTraceAnnotations(
-                tracked.file,
-                tracked.toBeProcessedMarkToTrack,
-                tracked.alreadyProcessedMarkToTrack,
-            )
+        forEachFile { tracked ->
+            tracked.signals.forEach {
+                unprocessTraceAnnotations(
+                    tracked.file,
+                    it.toBeProcessedMarkToTrack,
+                    it.alreadyProcessedMarkToTrack,
+                )
+            }
         }
     }
 

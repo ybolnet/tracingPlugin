@@ -14,19 +14,18 @@ internal class MethodsSorter(private val text: String) : ResultSorter<TracedMeth
                 it.line
             }.also {
                 if (TrackingPlugin.DEBUG) println("SORTING before ${list.map { it.name }}")
-                if (TrackingPlugin.DEBUG) println("SORTING after ${it.map { it.method.name + " l=" + it.line }}")
-            }.map {
-                it.method
+                if (TrackingPlugin.DEBUG) println("SORTING after ${it.map { it.name + " l=" + it.line }}")
             }
     }
 
+    /*
     data class MethodWithPosition(
         val method: TracedMethod,
         val line: Int,
-    )
+    )*/
 
-    private fun List<MethodWithPosition>.removeRepetitions(): List<MethodWithPosition> {
-        val methodsMap = mutableMapOf<MethodId, MethodWithPosition>()
+    private fun List<TracedMethod>.removeRepetitions(): List<TracedMethod> {
+        val methodsMap = mutableMapOf<MethodId, TracedMethod>()
         return this.mapNotNull { positionedMethod ->
             if (methodsMap.containsKey(positionedMethod.getId())) {
                 null
@@ -37,9 +36,9 @@ internal class MethodsSorter(private val text: String) : ResultSorter<TracedMeth
         }
     }
 
-    private fun MethodWithPosition.getId(): MethodId {
+    private fun TracedMethod.getId(): MethodId {
         return MethodId(
-            name = this.method.name,
+            name = this.name,
             line = this.line,
         )
     }
@@ -49,21 +48,19 @@ internal class MethodsSorter(private val text: String) : ResultSorter<TracedMeth
         val line: Int,
     )
 
-    private fun List<TracedMethod>.withPosition(): List<MethodWithPosition> {
+    private fun List<TracedMethod>.withPosition(): List<TracedMethod> {
         val thingCountMap = mutableMapOf<TracedMethod, Int>()
-        val result = mutableListOf<MethodWithPosition>()
+        val result = mutableListOf<TracedMethod>()
 
         for (method in this) {
             val count = thingCountMap.getOrDefault(method, 0) + 1
             thingCountMap[method] = count
             result.add(
-                MethodWithPosition(
-                    method = method,
+                method.copy(
                     line = calculateLine(text, method.wholeSignature, count),
                 ),
             )
         }
-
         return result
     }
 
@@ -77,7 +74,7 @@ internal class MethodsSorter(private val text: String) : ResultSorter<TracedMeth
                 val subText = subtexts[i]
                 nbLines += subText.filter { it == '\n' }.length
             }
-            nbLines += (n - 1) * needle.filter { it == '\n' }.length
+            nbLines += (n - 1) * needle.filter { it == '\n' }.length +2
             if (TrackingPlugin.DEBUG) println("CALCULATE: returning $nbLines")
             nbLines
         } else {

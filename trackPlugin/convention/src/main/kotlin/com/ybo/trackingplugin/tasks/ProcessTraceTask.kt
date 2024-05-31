@@ -1,169 +1,118 @@
 package com.ybo.trackingplugin.tasks
 
-import com.ybo.trackingplugin.TrackingPlugin
-import com.ybo.trackingplugin.tasks.data.TraceAnnotationMark
-import com.ybo.trackingplugin.tasks.data.TracedMethod
-import com.ybo.trackingplugin.tasks.utils.TextExtractor
+import com.ybo.trackingplugin.tasks.data.Residual
+import com.ybo.trackingplugin.tasks.data.TracedExtract
+import com.ybo.trackingplugin.tasks.data.TrackedFile
+import com.ybo.trackingplugin.tasks.data.TrackedSignal
+import com.ybo.trackingplugin.tasks.utils.Timing
 import com.ybo.trackingplugin.tasks.utils.createCodeGenerator
-import com.ybo.trackingplugin.tasks.utils.createPatternProducerForTracedMethods
-import com.ybo.trackingplugin.tasks.utils.createPatternProducerForTracedParams
-import com.ybo.trackingplugin.tasks.utils.createPatternSearcherForTracedMethods
-import com.ybo.trackingplugin.tasks.utils.createPatternSearcherForTracedParams
-import com.ybo.trackingplugin.tasks.utils.impl.patterns.sorters.MethodsSorter
+import com.ybo.trackingplugin.tasks.utils.createSignalProcessor
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
-import java.io.File
 
 /** task adding a trace call at the start of every traced method.
  * counterpart of [UnprocessTraceTask]*/
 open class ProcessTraceTask : BrowsingTask() {
 
+    /**
+     * find signals in a file, and process them (ie add a tracer in the methods associated with the signals)
+     */
+    interface SignalProcessor {
+        /**
+         * starts the processing of the signals  ([TrackedSignal]) in the tracked file,
+         * while leaving for the caller the specifics about how to process each
+         * extract found in file text.
+         * Returns a [Residual] a conclusion object summarizing how many suspected
+         * annotation intents were not successfully processed, or matched with a signal
+         */
+        fun processSignalsInFile(
+            trackedFile: TrackedFile,
+            processExtract: (extract: TracedExtract) -> ReplacementIntent,
+        ): Residual
+
+        /**
+         * represents an order to replace [ReplacementIntent.targetInFileText]
+         * with [ReplacementIntent.replacement] in the file being processed
+         */
+        data class ReplacementIntent(
+            val targetInFileText: String,
+            val replacement: String,
+        )
+    }
+
     @TaskAction
     fun processTrace() {
-        alterationsMap = mutableMapOf<String, Int>()
-        startTime = System.currentTimeMillis()
         val residuals = mutableListOf<Residual>()
-        browseCode { tracked, config ->
-            if (TrackingPlugin.DEBUG) println("starting browsing took " + (System.currentTimeMillis() - startTime))
-            startTime = System.currentTimeMillis()
-            if (config.srcPath == null) {
-                throw GradleException("srcPath must be defined")
-            }
-            processTraceAnnotations(
-                tracked.file,
-                tracked.toBeProcessedMarkToTrack,
-                tracked.alreadyProcessedMarkToTrack,
-                config.tracerFactory,
-            ).also {
-                if (it.nbMarks != 0) {
-                    residuals.add(it)
+        val signalProcessor: SignalProcessor = createSignalProcessor()
+        forEachFile { trackedFile ->
+            processFile(trackedFile, signalProcessor).also { residual ->
+                if (residual.nbMarks != 0) {
+                    residuals.add(residual)
                 }
             }
         }
-        residuals
-            .fold("") { acc, residual ->
-                acc + residual.nbMarks +
-                    " remaining unprocessed marks in " + residual.filename + ",\n "
-            }
-            .let {
-                if (it.isNotBlank()) {
-                    println(" /!\\ final check problem : $it")
-                }
-            }
+        residuals.forEach {
+            logger.warn("${it.nbMarks} trace annotations mentions remaining unprocessed in ${it.filename}")
+        }
     }
 
-    private fun processTraceAnnotations(
-        file: File,
-        mark: TraceAnnotationMark,
-        processed: TraceAnnotationMark,
-        tracerFactortStr: String,
-    ): Residual {
+    private fun processFile(trackedFile: TrackedFile, signalProcessor: SignalProcessor): Residual {
+        var previousResultOfProcess: Residual? = null
+        var resultOfProcess: Residual? = null
+        while (!processShouldNotRepeat(previousResultOfProcess, resultOfProcess)) {
+            previousResultOfProcess = resultOfProcess
+            resultOfProcess =
+                signalProcessor.processSignalsInFile(trackedFile, this::processExtract)
+        }
+        return resultOfProcess!!
+    }
+
+    private fun processExtract(extract: TracedExtract): SignalProcessor.ReplacementIntent {
+        val timing = Timing()
         val tag = TraceProcessingParams.TAG
-        var text = file.readText()
-        if (TrackingPlugin.DEBUG) println("reading file ${file.name} took " + (System.currentTimeMillis() - startTime))
-        startTime = System.currentTimeMillis()
-        val codeGenerator = createCodeGenerator(mark.language)
-        var indexOfTraceInFile = 0
-        extractMethods(text, mark) { method ->
-            if (TrackingPlugin.DEBUG) println("processing method ${method.name} pattern ${method.patternType} ${mark.shortVersion} ")
-            try {
-                val paramsExtractor = TextExtractor(
-                    patternProducer = createPatternProducerForTracedParams(
-                        mark.language,
-                        method.patternType,
-                    ),
-                    patternSearcher = createPatternSearcherForTracedParams(
-                        mark.language,
-                        method.patternType,
-                    ),
-                )
-                startTime = System.currentTimeMillis()
-                val paramsStr = paramsExtractor
-                    .extract(method.paramBlock)
-                    .joinToString(", ") { it.name }
-                if (TrackingPlugin.DEBUG) println("extracting params " + (System.currentTimeMillis() - startTime))
-
-                val newLine = (method.wholeSignature + "")
-                    .replace(mark.shortVersion, processed.longVersion)
-                    .replace(mark.longVersion, processed.longVersion)
-
-                val alto = getMethodAlterationOffset(method, file)
-                if (TrackingPlugin.DEBUG) println("alterationOffset = $alto + $indexOfTraceInFile for file ${file.name} and method ${method.name}")
-                val alterationOffsetForThisMethod =
-                    getMethodAlterationOffset(method, file) + indexOfTraceInFile
-                text = text.replace(
-                    method.wholeSignature,
-                    newLine + codeGenerator.generate(
-                        params = paramsStr,
-                        tracerFactoryString = tracerFactortStr,
-                        insideMethodIndentation = method.indentationInsideMethod,
-                        methodName = method.name,
-                        tag = tag,
-                        alterationOffset = alterationOffsetForThisMethod,
-                        mark = mark
-                    ),
-                )
-
-                indexOfTraceInFile++
-                setMethodAlterationOffset(method, file, alterationOffsetForThisMethod)
-            } catch (error: GradleException) {
-                error.printStackTrace()
-                if (TrackingPlugin.DEBUG) println("skipping method ${method.name}...")
-            }
-        }
-        file.writeText(text)
-        if (TrackingPlugin.DEBUG) println("processing trace done for file " + file.name)
-        return Residual(file.name, nbOfResidualMarks(mark, text))
-    }
-
-    private fun extractMethods(
-        text: String,
-        mark: TraceAnnotationMark,
-        onMethod: (method: TracedMethod) -> Unit,
-    ) {
-        val methodExtractor = TextExtractor(
-            patternProducer = createPatternProducerForTracedMethods(mark),
-            patternSearcher = createPatternSearcherForTracedMethods(mark),
-            resultSorter = MethodsSorter(text),
-        )
-        val tracedMethods = methodExtractor.extract(text, mark)
-        if (TrackingPlugin.DEBUG) println("extracting took " + (System.currentTimeMillis() - startTime))
-        if (tracedMethods.isEmpty()) {
-            if (TrackingPlugin.DEBUG) println("no traced methods")
-            return
-        }
-
-        for (method in tracedMethods) {
-            if (TrackingPlugin.DEBUG) println("processing method ${method.name} pattern ${method.patternType} ${mark.shortVersion} ")
-            onMethod(method)
+        timing.start("treat extract $extract")
+        val method = extract.method
+        val mark = extract.signal.toBeProcessedMarkToTrack
+        val processed = extract.signal.alreadyProcessedMarkToTrack
+        val params = extract.params
+        val tracerFactortStr = extract.signal.tracerFactory
+        return try {
+            val codeGenerator = createCodeGenerator(mark.language)
+            val newLine = (method.wholeSignature + "")
+                .replace(mark.shortVersion, processed.longVersion)
+                .replace(mark.longVersion, processed.longVersion)
+            SignalProcessor.ReplacementIntent(
+                targetInFileText = method.wholeSignature,
+                replacement = newLine + codeGenerator.generate(
+                    params = params.joinToString(", ") { it.name },
+                    tracerFactoryString = tracerFactortStr,
+                    insideMethodIndentation = method.indentationInsideMethod,
+                    methodName = method.name,
+                    tag = tag,
+                    line = method.line,
+                    mark = mark,
+                ),
+            )
+        } catch (error: GradleException) {
+            error.printStackTrace()
+            SignalProcessor.ReplacementIntent("", "")
+        }.also {
+            timing.end("treat extract $extract")
         }
     }
 
-    private fun setMethodAlterationOffset(method: TracedMethod, file: File, offset: Int) {
-        val key = method.wholeSignature + file.name
-        alterationsMap[key] = offset
-    }
-
-    private fun getMethodAlterationOffset(method: TracedMethod, file: File): Int {
-        val key = method.wholeSignature + file.name
-        return alterationsMap[key] ?: 0
-    }
-
-    /** calculates number of [Residual]s when a file has been treated.*/
-    private fun nbOfResidualMarks(
-        mark: TraceAnnotationMark,
-        text: String,
-    ): Int {
-        val extendedFormNb = text.split(mark.longVersion, ignoreCase = true).size - 1
-        val contractedFormNb = text.split(mark.shortVersion, ignoreCase = true).size - 1
-        return extendedFormNb + contractedFormNb
-    }
-
-    /** represents a case of a annotation mark that was not recognized as a tracked method */
-    data class Residual(val filename: String, val nbMarks: Int)
-
-    companion object {
-        var alterationsMap = mutableMapOf<String, Int>()
-        private var startTime: Long = 0L
+    private fun processShouldNotRepeat(
+        previousResultOfProcess: Residual?,
+        resultOfProcess: Residual?,
+    ): Boolean {
+        val allWasProcessed = resultOfProcess?.let {
+            it.nbMarks == 0
+        } ?: false
+        val noMoreCanBeDone = resultOfProcess?.let { currentResult ->
+            previousResultOfProcess?.let { previousResult ->
+                currentResult == previousResult
+            } ?: false
+        } ?: false
+        return allWasProcessed || noMoreCanBeDone
     }
 }

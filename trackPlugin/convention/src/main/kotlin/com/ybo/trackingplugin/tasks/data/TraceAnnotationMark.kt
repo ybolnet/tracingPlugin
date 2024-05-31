@@ -16,7 +16,7 @@ class TraceAnnotationMark(
             } else if (wholeClass.endsWith(".")) {
                 throw GradleException("trace annotation is not well formatted ($wholeClass)")
             }
-            return "@" + wholeClass.substring(wholeClass.lastIndexOf('.')+1)
+            return "@" + wholeClass.substring(wholeClass.lastIndexOf('.') + 1)
         }
 
     val longVersion: String
@@ -37,4 +37,8 @@ class TraceAnnotationMark(
             TracedLanguage.KOTLIN -> ""
             TracedLanguage.OTHER -> ""
         }
+
+    override fun toString(): String {
+        return "<$wholeClass language $language>"
+    }
 }

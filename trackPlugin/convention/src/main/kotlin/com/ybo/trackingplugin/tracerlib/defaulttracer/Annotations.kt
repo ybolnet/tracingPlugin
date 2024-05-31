@@ -2,8 +2,13 @@ package com.ybo.trackingplugin.tracerlib.defaulttracer
 
 import com.ybo.trackingplugin.tracerlib.defaulttracer.tracers.Returner
 
+/**
+ * default trace annotation that can be configured with
+ * addDefaultConfig() in the tracing{} closure of build.gradle configuration
+ */
 annotation class DefTraceTest()
 
+@Repeatable
 annotation class ReverseTrace(val target: String)
 
 /**

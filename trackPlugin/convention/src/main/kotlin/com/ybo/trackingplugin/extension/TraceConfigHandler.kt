@@ -22,16 +22,12 @@ open class TraceProcessConfigHandler {
 
     /** adds a configuration,
      * but that is already prepopulated with default @DefTraceTest annotations*/
-    fun addDefaultConfig(init: DefaultTraceConfig.() -> Unit) {
+    fun addDefaultConfig() {
         val config = TraceConfig()
-        val defaultTraceConfig = DefaultTraceConfig()
-        defaultTraceConfig.init()
         config.apply {
             name = "DefaultEmbeddedConfig"
             tracerFactory = TraceDefaultFactory::class.java.canonicalName
             annotation = DefTraceTest::class.java.canonicalName
-            exclude = defaultTraceConfig.exclude
-            srcPath = defaultTraceConfig.srcPath
         }
         config.check()
         config.checkInsertability(editableListOfConfigs)
@@ -48,8 +44,6 @@ open class TraceProcessConfigHandler {
             name = "ReturnTraceConfig"
             annotation = ReturnTrace::class.java.canonicalName
             tracerFactory = returnConfig.tracerFactory
-            exclude = returnConfig.exclude
-            srcPath = returnConfig.srcPath
         }
 
         config.check()
@@ -85,10 +79,7 @@ open class TraceProcessConfigHandler {
         if (tracerFactory.isEmpty()) {
             throw GradleException("in trace config $name, tracerFactory must be defined")
         }
-        if (srcPath == null) {
-            throw GradleException("in trace config $name, srcPath must be defined")
-        }
-        if (!annotation!!.contains('.') ) {
+        if (!annotation!!.contains('.')) {
             throw GradleException("in trace config $name, annotations must be defined in their full form (f.i. pretty.nice.package.TraceAnnotation)")
         }
         if (annotation.equals(alreadyProcessedAnnotation())) {

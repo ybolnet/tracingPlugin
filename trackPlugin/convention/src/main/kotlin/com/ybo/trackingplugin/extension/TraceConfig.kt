@@ -5,9 +5,7 @@ import com.ybo.trackingplugin.tasks.utils.createReverseTraceAnnotationConfig
 data class TraceConfig(
     var name: String = "",
     var tracerFactory: String = "",
-    var exclude: Array<String>? = null,
     var annotation: String? = null,
-    var srcPath: String? = null,
 ) {
     /**
      * an "reverse" annotation that will be written in the code as a beacon for where a

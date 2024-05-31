@@ -7,22 +7,24 @@ plugins {
 
 tracing {
     trackables = ["installDevelopDebug", "assembleDevelop"]
+    srcPath = "../app/src/main"
+    debug = true
     config {
         def annotationPackage = "com.ey.ybo.trackingplugin.annotations"
-        addDefaultConfig { conf ->
-            conf.srcPath = "../app/src/main"
-        }
         addReturnValueConfig { conf ->
-            conf.srcPath = "../app/src/main"
             conf.tracerFactory = "${annotationPackage}.ReturnTracerFactory"
         }
-        /*add{conf->
-            conf.name = "Trace"
-            conf.toBeProcessedAnnotation = "${annotationPackage}.Trace"
-            conf.alreadyProcessedAnnotation = "${annotationPackage}.UnTrace"
-            conf.srcPath = "../app/src/main"
-            conf.tracerFactory = "${annotationPackage}.tracers.TracerFactory_WithReturns"
-        }*/
+        add{conf->
+            conf.name = "Bullshit"
+            conf.annotation = "${annotationPackage}.Bullshit"
+            conf.tracerFactory = "${annotationPackage}.BullshitTracerFactory"
+        }
+        add{conf->
+            conf.name = "Coco"
+            conf.annotation = "${annotationPackage}.Cocomerlo"
+            conf.tracerFactory = "${annotationPackage}.BullshitTracerFactory"
+        }
+        addDefaultConfig ()
     }
 
 }

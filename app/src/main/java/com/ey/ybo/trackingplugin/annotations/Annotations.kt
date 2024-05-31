@@ -5,9 +5,12 @@ import com.ybo.trackingplugin.tracerlib.Tracer.TraceHistoryManagementAction.None
 import com.ybo.trackingplugin.tracerlib.defaulttracer.ReturnTrace
 import com.ybo.trackingplugin.tracerlib.defaulttracer.tracers.ReturnValueTracer
 import com.ybo.trackingplugin.tracerlib.defaulttracer.tracers.Returner
+import com.ybo.trackingplugin.tracerlib.defaulttracer.tracers.SimplestDefaultTracer
 
 annotation class Trace()
 annotation class Bullshit()
+
+annotation class Cocomerlo()
 
 fun <T> Any?.withTrace(): T {
     return ExampleReturner().trace(this as T)
@@ -33,5 +36,11 @@ class ReturnTracer : ReturnValueTracer() {
     ): Tracer.TraceHistoryManagementAction {
         println("returning from $methodReturning $returnedObject")
         return None
+    }
+}
+
+class BullshitTracerFactory : Tracer.Factory {
+    override fun create(): Tracer {
+        return SimplestDefaultTracer()
     }
 }

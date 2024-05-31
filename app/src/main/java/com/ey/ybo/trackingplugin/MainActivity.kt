@@ -11,26 +11,35 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.ey.ybo.trackingplugin.annotations.Bullshit
+import com.ey.ybo.trackingplugin.annotations.Cocomerlo
 import com.ey.ybo.trackingplugin.annotations.Trace
 import com.ey.ybo.trackingplugin.annotations.withTrace
 import com.ey.ybo.trackingplugin.ui.theme.TrackingPluginTheme
 import com.ybo.trackingplugin.tracerlib.defaulttracer.DefTraceTest
 
 /**
-ok @DefTraceTest as test
+ok as test
  */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         test(1, 2.2)
         test2()
-        testar(1, 2) @Bullshit @DefTraceTest @Trace { b ->
+        testar(1, 2) @DefTraceTest @Trace { b ->
             val v = 1
         }
 
-        testardinho(1, 2) @Bullshit @DefTraceTest @Trace {
-            val v = 1
-        }
+        testardinho(
+            1,
+            2,
+            {
+                val b = 2
+            },
+            @DefTraceTest @Trace
+            {
+                val v = 1
+            },
+        )
         setContent {
             TrackingPluginTheme {
                 // A surface container using the 'background' color from the theme
@@ -63,7 +72,7 @@ fun testar(b: Int?, c: Int, block: (a: Int) -> Unit) {
 }
 
 @DefTraceTest
-fun testardinho(b: Int, c: Int, block: () -> Unit) {
+fun testardinho(b: Int, c: Int, bo: () -> Unit, block: () -> Unit) {
     block.invoke()
 }
 
@@ -74,6 +83,13 @@ fun test3() {
 
 @DefTraceTest
 private suspend fun test4() {
+    val b: Int = 1
+}
+
+@DefTraceTest
+@Cocomerlo
+@Bullshit
+private suspend fun testBullshit() {
     val b: Int = 1
 }
 
@@ -104,3 +120,4 @@ fun GreetingPreview() {
 inline fun <T> MainActivity.testExtension(p1: Int, p2: Int = 2): Double {
     return 0.0
 }
+

@@ -25,14 +25,20 @@ class TrackingPlugin : Plugin<Project> {
             }
 
             tasks.register<ProcessTraceTask>(TraceProcessingParams.PROCESSING_TASK_NAME) {
+                trackingConfig.check()
                 listOfConfigs = trackingConfig.configurationHandler.configs
+                srcPath = trackingConfig.srcPath
+                exclude = trackingConfig.exclude
                 doLast {
                     if (TrackingPlugin.DEBUG) println("PROCESSTRACE processing trace ")
                 }
             }
 
             tasks.register<UnprocessTraceTask>(TraceProcessingParams.REVERSE_PROCESSING_TASK_NAME) {
+                trackingConfig.check()
                 listOfConfigs = trackingConfig.configurationHandler.configs
+                srcPath = trackingConfig.srcPath
+                exclude = trackingConfig.exclude
                 doLast {
                     if (TrackingPlugin.DEBUG) println("PROCESSTRACE Put trace annotation back to normal")
                 }
@@ -66,7 +72,9 @@ class TrackingPlugin : Plugin<Project> {
         }
     }
 
+
+
     companion object {
-        var DEBUG: Boolean = false
+        var DEBUG: Boolean = true
     }
 }

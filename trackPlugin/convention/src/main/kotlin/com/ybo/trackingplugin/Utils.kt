@@ -12,3 +12,19 @@ fun String.decodedFromB64(): String {
     val decodedBytes = Base64.getDecoder().decode(this)
     return String(decodedBytes)
 }
+
+fun String.nbOccurencesOf(searchStr: String): Int {
+    var count = 0
+    var startIndex = 0
+
+    while (startIndex < length) {
+        val index = indexOf(searchStr, startIndex)
+        if (index >= 0) {
+            count++
+            startIndex = index + searchStr.length
+        } else {
+            break
+        }
+    }
+    return count
+}

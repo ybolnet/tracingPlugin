@@ -10,7 +10,7 @@ object TracePerformer {
         java: Boolean,
         annotationName: String,
         paramz: Array<Any?>,
-        alterationOffset: Int,
+        line: Int,
     ) {
         val tracer = tracerFactory.create()
         val throwable = Throwable()
@@ -32,9 +32,6 @@ object TracePerformer {
             (stackElement?.className ?: "") +
                 "." + stackElement?.methodName
             )
-        val line = stackElement?.lineNumber?.let {
-            (it - alterationOffset).coerceAtLeast(0)
-        } ?: 0
 
         val stringLink = stackElement?.fileName?.let {
             "$it:$line"
