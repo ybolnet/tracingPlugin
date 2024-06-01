@@ -11,13 +11,13 @@ interface Tracer {
      * (for instance we might want to keep the history of call in memory under a certain size to avoid memory problems)
      * */
     fun trace(
-        defaultMessage: String,
         java: Boolean,
         method: Method,
         history: List<Method?>,
         parameterValues: Array<Any?>,
     ): TraceHistoryManagementAction
 
+    /** name of the annotation tracing a mthod */
     @JvmInline
     value class TraceAnnotationName(val value: String)
 
@@ -88,12 +88,45 @@ interface Tracer {
         val originalName: String,
         val possiblyObfuscatedMethod: String,
         val link: String = "",
-        val annotation: TraceAnnotationName
+        val annotation: TraceAnnotationName,
     )
 
     /** factory for Tracers. */
     interface Factory {
         /** instantiates a Tracer. */
         fun create(): Tracer
+    }
+
+    /** constructs an already formatted message for trace */
+    fun getDefaultMessage(
+        method: Tracer.Method,
+        parameterValues: Array<Any?>,
+    ): String {
+        return "${method.asLoggable()} " +
+            "(${
+                parameterValues.fold("") { acc, item -> acc + item + "," }
+            })" +
+            " ${method.annotation.asTag()} $TAG"
+    }
+
+    fun TraceAnnotationName.asTag(): String {
+        return "#feature:" + this.shortName()
+    }
+
+    fun Tracer.Method.asLoggable(): String {
+        return "$link - ${originalName.lastPart()}"
+    }
+
+    fun String.lastPart(): String {
+        val lastDotIndex = lastIndexOf('.')
+        return if (lastDotIndex == -1) {
+            this // If no dot found, return the original string
+        } else {
+            substring(lastDotIndex + 1)
+        }
+    }
+
+    companion object {
+        const val TAG = "#Trace"
     }
 }

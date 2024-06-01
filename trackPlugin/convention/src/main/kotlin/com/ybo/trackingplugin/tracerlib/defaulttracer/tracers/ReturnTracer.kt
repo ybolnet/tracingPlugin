@@ -8,10 +8,10 @@ import com.ybo.trackingplugin.tracerlib.Tracer.TraceHistoryManagementAction
  * in the config{} closure of the plugin, use
  *
  *          addReturnValueConfig {
- *             tracerFactory = "HERE PUT FACTORY CREATING A SUBTYPE OF ReturnValueTracer"
+ *             tracerFactory = "OPTIONALY HERE PUT FACTORY CREATING A SUBTYPE OF ReturnValueTracer"
  *         }
  */
-abstract class ReturnValueTracer : Tracer {
+abstract class ReturnValueTracer() : Tracer {
 
     /**
      * override this to be warned of a method returning,
@@ -25,7 +25,6 @@ abstract class ReturnValueTracer : Tracer {
     ): TraceHistoryManagementAction
 
     override fun trace(
-        defaultMessage: String,
         java: Boolean,
         method: Tracer.Method,
         history: List<Tracer.Method?>,
@@ -38,6 +37,8 @@ abstract class ReturnValueTracer : Tracer {
         val contextOfReturn = history.getMethodFromHistory(parameterValues[1] as String)?.let {
             ReturningContext.CompleteMethod(it)
         } ?: ReturningContext.MethodName(parameterValues[1] as String)
+        val defaultMessage = "<-- ${contextOfReturn.asLoggable()}(...) RETURNING $returnedObject" +
+            " ${contextOfReturn.getAnnotation()?.asTag()} ${Tracer.TAG}"
         return traceReturn(defaultMessage, contextOfReturn, history, returnedObject)
     }
 
@@ -57,8 +58,41 @@ abstract class ReturnValueTracer : Tracer {
         value class MethodName(val value: String) : ReturningContext
     }
 
+    fun ReturningContext.asLoggable(): String {
+        return when (this) {
+            is ReturningContext.CompleteMethod -> value.asLoggable()
+            is ReturningContext.MethodName -> "NOLINK - ${value.lastPart()}"
+        }
+    }
+
+    fun ReturnValueTracer.ReturningContext.getAnnotation(): Tracer.TraceAnnotationName? {
+        return when (this) {
+            is ReturnValueTracer.ReturningContext.CompleteMethod -> value.annotation
+            is ReturnValueTracer.ReturningContext.MethodName -> null
+        }
+    }
+
     private fun List<Tracer.Method?>.getMethodFromHistory(methodObf: String): Tracer.Method? {
         return this.find { it?.possiblyObfuscatedMethod == methodObf }
+    }
+}
+
+/**
+ * default factory for return values when user does not wish to customize
+ */
+class DefaultReturnValueTracerFactory : Tracer.Factory {
+    override fun create(): Tracer {
+        return object : ReturnValueTracer() {
+            override fun traceReturn(
+                defaultMessage: String,
+                methodReturning: ReturningContext,
+                history: List<Tracer.Method?>,
+                returnedObject: Any?,
+            ): TraceHistoryManagementAction {
+                println(defaultMessage)
+                return TraceHistoryManagementAction.None
+            }
+        }
     }
 }
 

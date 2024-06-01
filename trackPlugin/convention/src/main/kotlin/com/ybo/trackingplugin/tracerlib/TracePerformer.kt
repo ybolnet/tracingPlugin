@@ -48,7 +48,6 @@ object TracePerformer {
 
         historyOfMethods.add(currentMethod)
         tracer.trace(
-            defaultMessage = makeMessage(java, fullMethodName, paramz),
             java = java,
             method = currentMethod,
             history = historyOfMethods,
@@ -70,20 +69,6 @@ object TracePerformer {
                 }
             }
         }
-    }
-
-    private fun makeMessage(
-        java: Boolean,
-        methodName: String,
-        parameterValues: Array<Any?>,
-    ): String {
-        val params = parameterValues.joinToString(", ") { param ->
-            param?.let {
-                it.toString() + " : " + it.javaClass.name
-            } ?: "null"
-        }
-
-        return " $methodName($params) "
     }
 
     private val historyOfMethods: MutableList<Tracer.Method?> = mutableListOf()

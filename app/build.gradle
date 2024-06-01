@@ -11,20 +11,16 @@ tracing {
     debug = true
     config {
         def annotationPackage = "com.ey.ybo.trackingplugin.annotations"
-        addReturnValueConfig { conf ->
-            conf.tracerFactory = "${annotationPackage}.ReturnTracerFactory"
-        }
-        add{conf->
+        addReturnValueConfig {}
+        add { conf ->
             conf.name = "Bullshit"
             conf.annotation = "${annotationPackage}.Bullshit"
-            conf.tracerFactory = "${annotationPackage}.BullshitTracerFactory"
         }
-        add{conf->
+        add { conf ->
             conf.name = "Coco"
             conf.annotation = "${annotationPackage}.Cocomerlo"
-            conf.tracerFactory = "${annotationPackage}.BullshitTracerFactory"
         }
-        addDefaultConfig ()
+        addDefaultConfig()
     }
 
 }

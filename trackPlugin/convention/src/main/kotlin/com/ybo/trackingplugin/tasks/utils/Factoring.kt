@@ -97,5 +97,5 @@ internal fun createPatternSearcherForTracedParams(
 }
 
 internal fun createReverseTraceAnnotationConfig(traceAnnotationConfig: String): String {
-    return "com.ybo.trackingplugin.tracerlib.defaulttracer.ReverseTrace(target =\"${traceAnnotationConfig.toB64()}\")"
+    return "com.ybo.trackingplugin.tracerlib.defaulttracer.ReverseTrace(target = \"${traceAnnotationConfig.toB64()}\")"
 }

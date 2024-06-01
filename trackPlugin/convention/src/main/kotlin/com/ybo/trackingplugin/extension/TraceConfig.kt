@@ -1,10 +1,11 @@
 package com.ybo.trackingplugin.extension
 
 import com.ybo.trackingplugin.tasks.utils.createReverseTraceAnnotationConfig
+import com.ybo.trackingplugin.tracerlib.defaulttracer.tracers.TraceDefaultFactory
 
 data class TraceConfig(
     var name: String = "",
-    var tracerFactory: String = "",
+    var tracerFactory: String = TraceDefaultFactory::class.java.canonicalName,
     var annotation: String? = null,
 ) {
     /**
