@@ -31,39 +31,23 @@ interface Tracer {
         /** clear history*/
         object Clear : TraceHistoryManagementAction
 
-        /** delete oldest entry in history */
-        object DeleteOldest : TraceHistoryManagementAction
+        /** nulls oldest entry in history */
+        object NullOldest : TraceHistoryManagementAction
 
         /** null the entry at a specific index */
         data class NullAtIndex(val index: Int) : TraceHistoryManagementAction
     }
 
     /**
-     * [TraceHistoryManagementAction.DeleteOldest] (removing oldest entry in history)
-     * if the history is too big (taking in account null values),
+     * returns receiver
+     * if the history is too big (nb of non null values), or
      * [TraceHistoryManagementAction.None] (no action) otherwise
      */
-    fun TraceHistoryManagementAction.DeleteOldest.ifOverLimitSize(
+    fun TraceHistoryManagementAction.ifOverLimit(
         history: List<Method?>,
         maxSize: Int,
     ): TraceHistoryManagementAction {
-        return if (history.size >= maxSize) {
-            this
-        } else {
-            TraceHistoryManagementAction.None
-        }
-    }
-
-    /**
-     * [TraceHistoryManagementAction.DeleteOldest] (removing oldest entry in history)
-     * if the history is too big (ignoring null values),
-     * [TraceHistoryManagementAction.None] (no action) otherwise
-     */
-    fun TraceHistoryManagementAction.DeleteOldest.ifNoNullsOverLimitSize(
-        history: List<Method?>,
-        maxSize: Int,
-    ): TraceHistoryManagementAction {
-        return if (history.mapNotNull { it }.size >= maxSize) {
+        return if (history.nbNoNullValues() >= maxSize) {
             this
         } else {
             TraceHistoryManagementAction.None
@@ -125,6 +109,12 @@ interface Tracer {
             substring(lastDotIndex + 1)
         }
     }
+
+    private fun List<Method?>.nbNoNullValues(): Int {
+        return mapNotNull { it }.size
+    }
+
+    private fun List<Method?>.onlyNullValues(): Boolean = nbNoNullValues() == 0
 
     companion object {
         const val TAG = "#Trace"

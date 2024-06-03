@@ -7,16 +7,6 @@ import com.ybo.trackingplugin.tracerlib.Tracer
  */
 class TraceDefaultFactory : Tracer.Factory {
     override fun create(): Tracer {
-        return object : Tracer {
-            override fun trace(
-                java: Boolean,
-                method: Tracer.Method,
-                history: List<Tracer.Method?>,
-                parameterValues: Array<Any?>,
-            ): Tracer.TraceHistoryManagementAction {
-                println(getDefaultMessage(method, parameterValues))
-                return Tracer.TraceHistoryManagementAction.None
-            }
-        }
+        return SimpleTracer()
     }
 }

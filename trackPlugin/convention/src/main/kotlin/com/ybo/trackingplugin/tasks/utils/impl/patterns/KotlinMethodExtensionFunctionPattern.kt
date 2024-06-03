@@ -9,5 +9,5 @@ internal open class KotlinMethodExtensionFunctionPattern(
     override val markToLookFor: TraceAnnotationMark,
 ) : KotlinMethodPattern(markToLookFor) {
     override val name = KotlinMethodPatternName.KotlinExtensionFunction
-    override val methodName: String = "[\\w\\.]+"
+    override val methodName: String = "$ANY_TYPE\\.\\w+"
 }

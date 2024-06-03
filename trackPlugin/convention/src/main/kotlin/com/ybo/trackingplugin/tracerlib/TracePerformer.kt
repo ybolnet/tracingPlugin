@@ -55,7 +55,7 @@ object TracePerformer {
         ).also {
             when (it) {
                 Tracer.TraceHistoryManagementAction.Clear -> historyOfMethods.clear()
-                Tracer.TraceHistoryManagementAction.DeleteOldest -> {
+                Tracer.TraceHistoryManagementAction.NullOldest -> {
                     if (historyOfMethods.size >= 1) {
                         historyOfMethods[0] = null
                     }

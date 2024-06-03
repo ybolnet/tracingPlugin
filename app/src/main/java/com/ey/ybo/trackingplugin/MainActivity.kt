@@ -121,3 +121,7 @@ inline fun <T> MainActivity.testExtension(p1: Int, p2: Int = 2): Double {
     return 0.0
 }
 
+@DefTraceTest
+fun List<Int>.testExto(): Int {
+    return 1
+}
