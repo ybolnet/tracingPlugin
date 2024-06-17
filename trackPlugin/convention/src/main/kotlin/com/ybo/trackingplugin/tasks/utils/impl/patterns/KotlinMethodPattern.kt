@@ -20,7 +20,11 @@ internal open class KotlinMethodPattern(
     open val generics: String = "(?:\\s*<\\s*$VAR_NAME\\s*$RETURNED_TYPE?>\\s*)"
     open val methodName: String = "\\w+"
     open val paramsWithCapture: String =
-        "\\((\\s*(?:\\w*\\s*:\\s*[\\w\\.\\?]*(?:\\(.*\\)\\s*->\\s*[\\w\\.]*)?(?:\\s*=\\s*.*)?,?\\s*)*\\s*)\\)"
+        "\\((\\s*(?:" +
+            "\\w*\\s*:\\s*$ANY_TYPE" +
+            "(?:\\(.*\\)\\s*->\\s*[\\w\\.]*)?" +
+            "(?:\\s*=\\s*.*)?" +
+            ",?\\s*)*\\s*)\\)"
 
     // "\\(([^)]*)\\)"
     open val returnType: String = "(?::\\s*$ANY_TYPE)"
@@ -34,7 +38,7 @@ internal open class KotlinMethodPattern(
 
     override fun regex(): Regex {
         return Regex(
-            "(${getTraceAnnotation()})\\s*\\n*" +
+            "(${getTraceAnnotation()})\\s+" +
                 "$fillerAnnotations*\\s*" +
                 "$preFunKeywords*" +
                 "$funKeyword\\b" +

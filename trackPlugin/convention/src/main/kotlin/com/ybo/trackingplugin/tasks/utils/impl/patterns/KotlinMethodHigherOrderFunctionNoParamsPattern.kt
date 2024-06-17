@@ -12,7 +12,7 @@ internal class KotlinMethodHigherOrderFunctionNoParamsPattern(
         return Regex(
             ".*(\\w*).*" +
                 "$fillerAnnotations*\\s*" +
-                "(${getTraceAnnotation()})\\s*" +
+                "(${getTraceAnnotation()})\\s+" +
                 "$fillerAnnotations*\\s*" +
                 "\\{[\\t ]*\\n" +
                 "($insideIndentation)",

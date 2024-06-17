@@ -11,7 +11,7 @@ import com.ybo.trackingplugin.tracerlib.Tracer.TraceHistoryManagementAction
  *             tracerFactory = "OPTIONALY HERE PUT FACTORY CREATING A SUBTYPE OF ReturnValueTracer"
  *         }
  */
-abstract class ReturnValueTracer() : Tracer {
+abstract class ReturnValueTracer() : ContextualTracer() {
 
     /**
      * override this to be warned of a method returning,
@@ -34,46 +34,13 @@ abstract class ReturnValueTracer() : Tracer {
             throw Error("tracking error")
         }
         val returnedObject = parameterValues[0]
-        val contextOfReturn = history.getMethodFromHistory(parameterValues[1] as String)?.let {
+        val contextMethodName = parameterValues[1] as String
+        val contextOfReturn = history.getMethodFromHistory(contextMethodName)?.let {
             ReturningContext.CompleteMethod(it)
-        } ?: ReturningContext.MethodName(parameterValues[1] as String)
+        } ?: ReturningContext.MethodName(contextMethodName)
         val defaultMessage = "<-- ${contextOfReturn.asLoggable()}(...) RETURNING $returnedObject" +
             " ${contextOfReturn.getAnnotation()?.asTag()} ${Tracer.TAG}"
         return traceReturn(defaultMessage, contextOfReturn, history, returnedObject)
-    }
-
-    /**
-     * represents the code region (a method) returning the value.
-     * is the history is handled well, it is a [CompleteMethod].
-     * But if in the previous [Tracer.trace] calls you returned a value to manipulate
-     * the trace history, the method might have disappeared from history,
-     * and in this case, only the (possibly obfuscated) name of the returning function has
-     * survived. In this case we are dealing with a [MethodName]
-     */
-    sealed interface ReturningContext {
-        @JvmInline
-        value class CompleteMethod(val value: Tracer.Method) : ReturningContext
-
-        @JvmInline
-        value class MethodName(val value: String) : ReturningContext
-    }
-
-    fun ReturningContext.asLoggable(): String {
-        return when (this) {
-            is ReturningContext.CompleteMethod -> value.asLoggable()
-            is ReturningContext.MethodName -> "NOLINK - ${value.lastPart()}"
-        }
-    }
-
-    fun ReturnValueTracer.ReturningContext.getAnnotation(): Tracer.TraceAnnotationName? {
-        return when (this) {
-            is ReturnValueTracer.ReturningContext.CompleteMethod -> value.annotation
-            is ReturnValueTracer.ReturningContext.MethodName -> null
-        }
-    }
-
-    private fun List<Tracer.Method?>.getMethodFromHistory(methodObf: String): Tracer.Method? {
-        return this.find { it?.possiblyObfuscatedMethod == methodObf }
     }
 }
 
@@ -96,27 +63,6 @@ class DefaultReturnValueTracerFactory : Tracer.Factory {
     }
 }
 
-/**
- * part of the process to trace return value.
- * Implement this
- */
-abstract class Returner {
-
-    fun <T> trace(returnValue: T): T {
-        val stackElement = Throwable().stackTrace.run {
-            if (size >= 3) {
-                this[2]
-            } else {
-                null
-            }
-        }
-        val fullMethodName =
-            (stackElement?.className ?: "") + "." + (stackElement?.methodName ?: "")
-        return onAnnotateThisToTrace(returnValue, fullMethodName)
-    }
-
-    abstract fun <T> onAnnotateThisToTrace(toTrace: T, callingMethod: String): T
-}
 /*
 
 fun <T> Any?.withTrace(): T {

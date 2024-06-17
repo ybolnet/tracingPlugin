@@ -13,7 +13,7 @@ internal open class KotlinMethodHigherOrderFunctionPattern(
         return Regex(
             ".*(\\w*).*" +
                 "$fillerAnnotations*\\s*" +
-                "(${getTraceAnnotation()})\\s*" +
+                "(${getTraceAnnotation()})\\s+" +
                 "$fillerAnnotations*\\s*" +
                 "\\{" +
                 paramsWithCapture +

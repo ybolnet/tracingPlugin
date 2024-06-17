@@ -1,5 +1,6 @@
 package com.ybo.trackingplugin.tasks.utils
 
+import com.ybo.trackingplugin.tasks.BrowsingTask
 import com.ybo.trackingplugin.tasks.ProcessTraceTask
 import com.ybo.trackingplugin.tasks.data.TraceAnnotationMark
 import com.ybo.trackingplugin.tasks.data.TracedLanguage
@@ -95,6 +96,8 @@ internal fun createPatternSearcherForTracedParams(
         TracedLanguage.OTHER -> throw GradleException("unknown language")
     }
 }
+
+internal fun createSignalsExtractor(): BrowsingTask.SignalsExtractor = SignalsExtractorImpl()
 
 internal fun createReverseTraceAnnotationConfig(traceAnnotationConfig: String): String {
     return "com.ybo.trackingplugin.tracerlib.defaulttracer.ReverseTrace(target = \"${traceAnnotationConfig.toB64()}\")"

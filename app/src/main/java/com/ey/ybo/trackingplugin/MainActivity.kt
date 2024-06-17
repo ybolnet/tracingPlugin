@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.ey.ybo.trackingplugin.annotations.Bullshit
 import com.ey.ybo.trackingplugin.annotations.Cocomerlo
 import com.ey.ybo.trackingplugin.annotations.Trace
+import com.ey.ybo.trackingplugin.annotations.lambdaWithTrace
 import com.ey.ybo.trackingplugin.annotations.withTrace
 import com.ey.ybo.trackingplugin.ui.theme.TrackingPluginTheme
 import com.ybo.trackingplugin.tracerlib.defaulttracer.DefTraceTest
@@ -21,9 +22,10 @@ import com.ybo.trackingplugin.tracerlib.defaulttracer.DefTraceTest
 ok as test
  */
 class MainActivity : ComponentActivity() {
+    @DefTraceTest
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        test(1, 2.2)
+        test(1, 2.2, 3)
         test2()
         testar(1, 2) @DefTraceTest @Trace { b ->
             val v = 1
@@ -34,11 +36,10 @@ class MainActivity : ComponentActivity() {
             2,
             {
                 val b = 2
-            },
-            @DefTraceTest @Trace
-            {
+            }.lambdaWithTrace(),
+            { i: Exception ->
                 val v = 1
-            },
+            }.lambdaWithTrace(),
         )
         setContent {
             TrackingPluginTheme {
@@ -55,7 +56,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @DefTraceTest
-fun test(p1: Int, p2: Double, p3: Int = 4): Int? {
+fun test(p1: Int, p2: Double, p3: Int): Int? {
     android.util.Log.d("TESTO", "TESTIL")
     val b: Int = p1
     return (p1 + 1).withTrace()
@@ -71,9 +72,10 @@ fun testar(b: Int?, c: Int, block: (a: Int) -> Unit) {
     block.invoke(1)
 }
 
-@DefTraceTest
-fun testardinho(b: Int, c: Int, bo: () -> Unit, block: () -> Unit) {
-    block.invoke()
+fun testardinho(b: Int, c: Int, success: () -> Unit, failure: (Exception) -> Unit) {
+    // block.invoke()
+    failure(java.lang.Exception("bob"))
+    val v =1
 }
 
 @DefTraceTest
@@ -116,8 +118,9 @@ fun GreetingPreview() {
     }
 }
 
+// p1: Int, p2: Int, list: List<Int>
 @DefTraceTest
-inline fun <T> MainActivity.testExtension(p1: Int, p2: Int = 2): Double {
+inline fun <T> testExtension(p1: Int, p2: Double): Double {
     return 0.0
 }
 

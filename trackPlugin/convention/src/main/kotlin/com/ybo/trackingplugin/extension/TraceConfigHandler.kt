@@ -1,6 +1,7 @@
 package com.ybo.trackingplugin.extension
 
 import com.ybo.trackingplugin.tracerlib.defaulttracer.DefTraceTest
+import com.ybo.trackingplugin.tracerlib.defaulttracer.LambdaTrace
 import com.ybo.trackingplugin.tracerlib.defaulttracer.ReturnTrace
 import com.ybo.trackingplugin.tracerlib.defaulttracer.tracers.TraceDefaultFactory
 import org.gradle.api.GradleException
@@ -15,9 +16,7 @@ open class TraceProcessConfigHandler {
     fun add(init: TraceConfig.() -> Unit) {
         val config = TraceConfig()
         config.init()
-        config.check()
-        config.checkInsertability(editableListOfConfigs)
-        editableListOfConfigs.add(config)
+        addConfig(config)
     }
 
     /** adds a configuration,
@@ -29,9 +28,7 @@ open class TraceProcessConfigHandler {
             tracerFactory = TraceDefaultFactory::class.java.canonicalName
             annotation = DefTraceTest::class.java.canonicalName
         }
-        config.check()
-        config.checkInsertability(editableListOfConfigs)
-        editableListOfConfigs.add(config)
+        addConfig(config)
     }
 
     /** adds a configuration,
@@ -45,10 +42,27 @@ open class TraceProcessConfigHandler {
             annotation = ReturnTrace::class.java.canonicalName
             tracerFactory = returnConfig.tracerFactory
         }
+        addConfig(config)
+    }
 
-        config.check()
-        config.checkInsertability(editableListOfConfigs)
-        editableListOfConfigs.add(config)
+    /** adds a configuration,
+     * but that is already prepopulated for lambda tracing feature*/
+    fun addLambdaTracingConfig(init: LambdaTraceConfig.() -> Unit) {
+        val config = TraceConfig()
+        val returnConfig = LambdaTraceConfig()
+        returnConfig.init()
+        config.apply {
+            name = "LambdaTraceConfig"
+            annotation = LambdaTrace::class.java.canonicalName
+            tracerFactory = returnConfig.tracerFactory
+        }
+        addConfig(config)
+    }
+
+    private fun addConfig(traceConfig: TraceConfig) {
+        traceConfig.check()
+        traceConfig.checkInsertability(editableListOfConfigs)
+        editableListOfConfigs.add(traceConfig)
     }
 
     private fun TraceConfig.checkInsertability(configs: List<TraceConfig>) {

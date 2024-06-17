@@ -12,6 +12,7 @@ tracing {
     config {
         def annotationPackage = "com.ey.ybo.trackingplugin.annotations"
         addReturnValueConfig {}
+        addLambdaTracingConfig {}
         add { conf ->
             conf.name = "Bullshit"
             conf.annotation = "${annotationPackage}.Bullshit"
@@ -19,6 +20,10 @@ tracing {
         add { conf ->
             conf.name = "Coco"
             conf.annotation = "${annotationPackage}.Cocomerlo"
+        }
+        add { conf ->
+            conf.name = "Special"
+            conf.annotation = "${annotationPackage}.Special.Tracing"
         }
         addDefaultConfig()
     }

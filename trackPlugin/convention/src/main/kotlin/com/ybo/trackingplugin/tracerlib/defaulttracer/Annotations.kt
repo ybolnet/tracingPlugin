@@ -1,5 +1,6 @@
 package com.ybo.trackingplugin.tracerlib.defaulttracer
 
+import com.ybo.trackingplugin.tracerlib.defaulttracer.tracers.LambdaReturner
 import com.ybo.trackingplugin.tracerlib.defaulttracer.tracers.Returner
 
 /**
@@ -16,3 +17,9 @@ annotation class ReverseTrace(val target: String)
  * trace return values
  */
 annotation class ReturnTrace()
+
+/**
+ * annotate this to your implementation of a [LambdaReturner], to be able to
+ * trace lambda calls
+ */
+annotation class LambdaTrace()
