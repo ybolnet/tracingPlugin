@@ -114,9 +114,18 @@ publishing {
         repositories {
             maven {
                 url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+/*
+                credentials(HttpHeaderCredentials::class) {
+                    name = System.getenv("MAVEN_PUBLISH_OSSRH_USERNAME")
+                    value = System.getenv("MAVEN_PUBLISH_OSSRH_TOKEN")
+                }
+                authentication {
+                    create<HttpHeaderAuthentication>("header")
+                }*/
+
                 credentials {
-                    username = System.getenv("TRACING_MAVEN_PUBLISH_USERNAME")
-                    password = System.getenv("TRACING_MAVEN_PUBLISH_PASSWORD")
+                    username = System.getenv("MAVEN_PUBLISH_OSSRH_USERNAME")
+                    password = System.getenv("MAVEN_PUBLISH_OSSRH_TOKEN")
                 }
             }
             maven {
