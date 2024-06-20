@@ -28,60 +28,7 @@ then to app-level build.gradle:
    ```
 
 
-now you must create in your code a set of 2 annotations that will represent the 2 states of the code: To-Be-Processed and Already-Processed.
-For example :
-
-   ```
-    annotation class SimpleTrace()
-annotation class ReverseSimpleTrace()
-   ```
-
-
-
-The methods annotated with SimpleTrace will be the one producing the tracing logs. The annotation ReverseSimpleTrace will not be used by you but by the plugin, to mark the method it has already processed.
-
-This plugin's job consists in adding a single line at the start of each method annotated with the annotation of your choice, and provides you with a hook to be called each time the annotated method is called, with its arguments.
-
-So now you have to implement your own tracer to be delegated to when a traced method is called:
-
-for example:
-
-   ```
-    package your.package.com
-
-import com.ybo.trackingplugin.tracerlib.Tracer
-
-import com.ybo.trackingplugin.tracerlib.Tracer
-
-class TraceFactory : Tracer.Factory {
-    override fun create(): Tracer {
-        return MyTracerImpl() //<- here your implementation of tracer
-    }
-}
-```
-For instance the simplest tracer would be:
-```
-package your.package.com
-
-import android.util.Log
-import com.ybo.trackingplugin.tracerlib.LimitedSizeList
-import com.ybo.trackingplugin.tracerlib.Tracer
-
-class SimplestTracer : Tracer {
-    override fun trace(
-        defaultMessage: String,
-        java: Boolean,
-        method: Tracer.Method,
-        history: LimitedSizeList<Tracer.Method>,
-        parameterValues: Array<Any?>,
-    ) {
-        Log.d("TAG", defaultMessage)
-    }
-}
-```
-
-So now in app build.gradle, you can plug in your tracer and your annotations by calling the "tracing" closure in app-level build.gradle.
-It would make your build.gradle look like this:
+So now, still in app build.gradle, you can add the necessary configurations, so that your app-level build gradle look like this:
 
 ```
 plugins {
@@ -92,20 +39,13 @@ plugins {
 tracing{
     trackables = arrayOf("installDebug") // means that install debug will be traced
     config{
-        //add a configuration for the couple @SimpleTrace/@ReverseSimpleTrace
-        add { 
-            name = "ANameForThisConfig"
-            toBeProcessedAnnotation = "your.package.com.SimpleTrace"
-            alreadyProcessedAnnotation = "your.package.com.ReverseSimpleTrace"
-            srcPath = "../app/src/main" // where the source code is
-            tracerFactory = "your.package.com.TraceFactory"
-        }
-        // and actually you can add as much configsthat you want.
+        //add a default config, that will trace every method annotated with annoation [@]DefTraceTest
+        addDefaultConfig()
     }
 }
 
 android{
-...
+// usual android stuff
 }
 
 dependencies{
@@ -114,17 +54,10 @@ implementation("io.github.ybolnet:traceplugin:VERSION")
 }
 ```
 
+The plugin is a preprocessor. It parses the code, look for annotations, edit the annotatated methods to add the logs.
+But since you only want to keep the code in this modified state for the build, the plugin is also able to remove all the added code and get back to the codebase original state.
 
-don't forget to also add the lib packaged in the plugin still in app build.gradle:
-
-
-```
-    dependencies{
-    implementation("io.github.ybolnet:traceplugin:VERSION")
-    }
- ```
-    
-After sync, 3 tasks will be added in group traceprocessing:
+Hence the plugins relies on three tasks, that are added after a sync (check in traceprogessing group)
 - processTrace
 - tracedInstallDebug
 - unprocessTrace
@@ -134,7 +67,10 @@ processTrace will edit the code to add the logs.
 unprocessTrace will get it back to what it was.
 
 tracedInstallDebug will do : processTrace -> installDebug -> unprocessTrace. So can install a traced version of your app on the phone.
-You can replace installDebug with any other task by adding them to "trackables" in the tracing closure.
+You can replace installDebug with any other task by adding them to "trackables" in the tracing closure. (see above)
+
+
+
 
 ## Restrictions:
 The Trace annotations should work fine with methods in java and kotlin.
